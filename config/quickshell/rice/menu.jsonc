@@ -102,7 +102,7 @@
     "action": "shell.reload" },
 
   { "id": "settings.system", "icon": "monitor", "label": "System" },
-  { "id": "settings.system.cc", "icon": "󰙵", "label": "Control centre", "hint": "Wi-Fi, Bluetooth, theme, night light",
+  { "id": "settings.system.cc", "icon": "󰙵", "label": "Control centre", "hint": "Wi-Fi, theme, night light",
     "action": "controlcenter" },
   { "id": "settings.system.sound", "icon": "󰕾", "label": "Sound", "hint": "outputs, inputs, per-app volume",
     "run": ["pavucontrol"] },

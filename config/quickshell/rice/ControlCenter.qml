@@ -1,12 +1,11 @@
 // Control centre, modelled on Nisfere's: a panel hanging from the bar with a
 // grid of glass toggle cards, volume and mic sliders, and detail pages for
-// Wi-Fi, Bluetooth, Ethernet and sound devices.
+// Wi-Fi, Ethernet and sound devices. (Bluetooth page removed: no Bluetooth on this PC.)
 //
 //   qs -c rice ipc call controlcenter toggle      (the bar's network/volume pill)
 //
 // Where each card gets its state:
 //   Wi-Fi, Ethernet   Quickshell.Networking (NetworkManager)
-//   Bluetooth         Quickshell.Bluetooth (BlueZ)
 //   volume, mic       Quickshell.Services.Pipewire - needs a PwObjectTracker,
 //                     or the nodes' audio properties never go live
 //   Energy            Quickshell.Services.UPower power profiles
@@ -22,7 +21,6 @@ import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import Quickshell.Networking
-import Quickshell.Bluetooth
 import Quickshell.Services.Pipewire
 import Quickshell.Services.UPower
 
@@ -30,7 +28,7 @@ Scope {
     id: root
 
     property bool open: false
-    property string page: "main"          // main | wifi | bluetooth | ethernet | sound
+    property string page: "main"          // main | wifi | ethernet | sound
     property var targetScreen: null
     property var visualiser: null          // wired up by shell.qml
 
@@ -97,10 +95,6 @@ Scope {
         value: root.open
         when: root.wifiDevice !== null
     }
-
-    // ---------------------------------------------------------- bluetooth --
-    readonly property var btAdapter: Bluetooth.defaultAdapter
-    readonly property var btConnected: Array.from(Bluetooth.devices.values).filter(d => d.connected)
 
     // -------------------------------------------------------------- audio --
     readonly property var sink: Pipewire.defaultAudioSink
@@ -302,7 +296,6 @@ Scope {
                     anchors.top: parent.top
                     anchors.margins: 18
                     sourceComponent: root.page === "wifi" ? wifiPage
-                                   : root.page === "bluetooth" ? bluetoothPage
                                    : root.page === "ethernet" ? ethernetPage
                                    : root.page === "sound" ? soundPage
                                    : mainPage
@@ -399,21 +392,6 @@ Scope {
                     hasMore: true
                     onClicked: Networking.wifiEnabled = !Networking.wifiEnabled
                     onMoreClicked: root.page = "wifi"
-                }
-
-                CcCard {
-                    Layout.fillWidth: true
-                    visible: root.btAdapter !== null
-                    icon: !root.btAdapter || !root.btAdapter.enabled ? "bluetooth-off"
-                        : root.btConnected.length ? "bluetooth-connected" : "bluetooth"
-                    title: "Bluetooth"
-                    active: root.btAdapter ? root.btAdapter.enabled : false
-                    subtitle: !root.btAdapter || !root.btAdapter.enabled ? "Off"
-                        : root.btConnected.length ? root.btConnected.map(d => d.name || d.deviceName).join(", ")
-                        : "On"
-                    hasMore: true
-                    onClicked: if (root.btAdapter) root.btAdapter.enabled = !root.btAdapter.enabled
-                    onMoreClicked: root.page = "bluetooth"
                 }
 
                 CcCard {
@@ -557,13 +535,6 @@ Scope {
     Component {
         id: wifiPage
         CcWifiPage {
-            cc: root
-        }
-    }
-
-    Component {
-        id: bluetoothPage
-        CcBluetoothPage {
             cc: root
         }
     }
