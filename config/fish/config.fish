@@ -20,8 +20,3 @@ end
 function fetch
     ~/.local/bin/arcade-fetch
 end
-
-# `play`: the Pac-Man minigame. Its best game is the HI-SCORE on the greeting.
-function play
-    ~/.local/bin/play $argv
-end

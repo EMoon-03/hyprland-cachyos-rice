@@ -2,8 +2,7 @@
 """Arcade greeting: prints fastfetch, then plays a short Pac-Man run on its attract row.
 
 Every dot Pac-Man eats adds to your 1UP score (10 a dot, 50 for the power pellet),
-and the score carries over between terminals, so it keeps going up. The best game
-of `play` is the HI-SCORE.
+and the score carries over between terminals, so it keeps going up.
 
   arcade-fetch            what the fish greeting and `fetch` run
   ARCADE_NO_ANIM=1        print it without the animation (the score still goes up)
@@ -26,7 +25,7 @@ GHOST_COLS = [6, 8, 10, 12]          # where the template draws the four ghosts
 PAC_COL = 16                         # ... Pac-Man
 DOT_COLS = list(range(18, 43, 2))    # ... the 13 dots
 PELLET = 30                          # ... and the power pellet among them
-SCORE_COL = 6                        # 1UP number on the line under "1UP"
+SCORE_COL = 20                       # 1UP number, centred on the line under "1UP"
 ROW_WIDTH = 46
 FRAME = 0.028                        # seconds per frame: the whole run is under a second
 
@@ -112,7 +111,7 @@ def main():
         lines.pop()                                  # the cursor now sits on the line after the last one
     plain = [ANSI.sub("", line) for line in lines]
     row = next((i for i, l in enumerate(plain) if PAC in l and "·" in l), None)
-    label = next((i for i, l in enumerate(plain) if "1UP" in l and "HI-SCORE" in l), None)
+    label = next((i for i, l in enumerate(plain) if l.strip() == "1UP"), None)
     points = 10 * (len(DOT_COLS) - 1) + 50
 
     size = shutil.get_terminal_size((80, 24))

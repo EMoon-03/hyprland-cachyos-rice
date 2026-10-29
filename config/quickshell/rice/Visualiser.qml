@@ -133,8 +133,15 @@ noise_reduction = 60
         onTriggered: root.start()
     }
 
+    // Main monitor only: the vertical side screen (taller than wide) is left clean.
+    // Falls back to every screen if none is landscape.
+    readonly property var screensHere: {
+        const landscape = Quickshell.screens.filter(s => s.width >= s.height)
+        return landscape.length ? landscape : Quickshell.screens
+    }
+
     Variants {
-        model: Quickshell.screens
+        model: root.screensHere
 
         PanelWindow {
             id: panel

@@ -1,8 +1,7 @@
 #!/bin/sh
-# Prints the two numbers under "1UP" and "HI-SCORE" on the arcade greeting.
-#   1UP       your total score: every terminal you open adds the dots Pac-Man eats,
-#             and every game of `play` adds its points
-#   HI-SCORE  your best single game of `play`
+# Prints the 1UP number on the arcade greeting: your total score. Every terminal
+# you open adds the dots Pac-Man eats (see arcade-fetch), so it keeps going up.
 d="${XDG_STATE_HOME:-$HOME/.local/state}/arcade"
-num() { v=$(cat "$1" 2>/dev/null); case "$v" in ''|*[!0-9]*) echo 0 ;; *) echo "$v" ;; esac; }
-printf '%06d%24s%06d\n' "$(num "$d/score")" "" "$(num "$d/hiscore")"
+v=$(cat "$d/score" 2>/dev/null)
+case "$v" in ''|*[!0-9]*) v=0 ;; esac
+printf '%06d\n' "$v"

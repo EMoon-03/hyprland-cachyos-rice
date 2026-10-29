@@ -65,18 +65,11 @@ across the middle. Each dot he eats adds 10 to your **1UP** score (the power
 pellet adds 50 and scares the ghosts), and the score carries over, so it climbs
 every time you open a terminal.
 
-Type **`play`** for the minigame: Pac-Man in the terminal, with four ghosts
-that each hunt their own way, power pellets, levels that speed up and 3 lives.
-Arrows, WASD or HJKL move, P pauses, Q quits. Your best game becomes the
-**HI-SCORE**, and every game's points go onto 1UP. It is also in the app
-launcher as *Arcade*.
-
 | | |
 |---|---|
 | greeting | `local/bin/arcade-fetch` (fastfetch + the Pac-Man run) |
 | layout and colours | `config/matugen/templates/fastfetch.jsonc`, title art in `config/fastfetch/arcade-title.txt` |
-| minigame | `local/bin/play` |
-| scores | `~/.local/state/arcade/score` and `hiscore`; delete them to reset |
+| score | `~/.local/state/arcade/score`; delete it to reset |
 | no animation | `set -Ux ARCADE_NO_ANIM 1` (the score still goes up) |
 | old greeting back | point `fish_greeting` in `config/fish/config.fish` at `~/.local/bin/rice-fetch.sh` |
 
