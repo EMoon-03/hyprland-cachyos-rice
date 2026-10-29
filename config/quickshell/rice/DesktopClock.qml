@@ -36,8 +36,14 @@ Scope {
     // Main monitor only: the vertical side screen (taller than wide) is left clean.
     // Falls back to every screen if none is landscape.
     readonly property var screensHere: {
-        const landscape = Quickshell.screens.filter(s => s.width >= s.height)
-        return landscape.length ? landscape : Quickshell.screens
+        // a plain loop: Quickshell.screens is a QML list, which has no .filter()
+        const all = [], landscape = []
+        for (const s of Quickshell.screens) {
+            all.push(s)
+            if (s.width >= s.height)
+                landscape.push(s)
+        }
+        return landscape.length ? landscape : all
     }
 
     Variants {
