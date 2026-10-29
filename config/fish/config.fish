@@ -8,16 +8,20 @@ end
 #    # smth smth
 #end
 
-# Greeting: see local/bin/rice-fetch.sh. It picks the logo size from the
-# CURRENT window width, animates the logo when ~/.config/fastfetch/logo.gif
-# exists, and falls back to a still image or text art otherwise.
+# Greeting: the arcade screen (local/bin/arcade-fetch). It prints fastfetch, then
+# Pac-Man runs across the attract row and every dot adds to the 1UP score, which
+# carries over between terminals. ARCADE_NO_ANIM=1 skips the run.
+# The old picture/GIF greeting is still there: ~/.local/bin/rice-fetch.sh
 function fish_greeting
-    ~/.local/bin/rice-fetch.sh
+    ~/.local/bin/arcade-fetch
 end
 
-# `fetch` redraws it at the window's present size. fastfetch prints once and
-# cannot reflow, so a window resized after the greeting stays wrong until
-# something prints it again - this is that something.
+# `fetch` prints it again (handy after resizing the window).
 function fetch
-    ~/.local/bin/rice-fetch.sh
+    ~/.local/bin/arcade-fetch
+end
+
+# `play`: the Pac-Man minigame. Its best game is the HI-SCORE on the greeting.
+function play
+    ~/.local/bin/play $argv
 end

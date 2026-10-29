@@ -1,0 +1,131 @@
+#!/usr/bin/env python3
+"""Arcade greeting: prints fastfetch, then plays a short Pac-Man run on its attract row.
+
+Every dot Pac-Man eats adds to your 1UP score (10 a dot, 50 for the power pellet),
+and the score carries over between terminals, so it keeps going up. The best game
+of `play` is the HI-SCORE.
+
+  arcade-fetch            what the fish greeting and `fetch` run
+  ARCADE_NO_ANIM=1        print it without the animation (the score still goes up)
+
+The row it animates is drawn by ~/.config/matugen/templates/fastfetch.jsonc;
+the column numbers below have to match it.
+"""
+import os
+import re
+import shutil
+import subprocess
+import sys
+import time
+
+STATE = os.path.join(os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state"), "arcade")
+SCORE_FILE = os.path.join(STATE, "score")
+
+GHOST, PAC, SHUT = "", "\U000f0baf", "●"
+GHOST_COLS = [6, 8, 10, 12]          # where the template draws the four ghosts
+PAC_COL = 16                         # ... Pac-Man
+DOT_COLS = list(range(18, 43, 2))    # ... the 13 dots
+PELLET = 30                          # ... and the power pellet among them
+SCORE_COL = 6                        # 1UP number on the line under "1UP"
+ROW_WIDTH = 46
+FRAME = 0.028                        # seconds per frame: the whole run is under a second
+
+# kitty's 16 colours come from the theme (matugen), so plain ANSI colours match it:
+# 31 error · 34 primary · 33 secondary · 32 tertiary · 90 outline · 97 text
+GHOST_COLORS = ["31", "34", "33", "97"]
+SCARED = "90"
+PAC_COLOR = "1;32"
+ANSI = re.compile(r"\x1b\[[0-9;?]*[A-Za-z]")
+
+
+def read_score():
+    try:
+        return int(open(SCORE_FILE).read().strip() or 0)
+    except (OSError, ValueError):
+        return 0
+
+
+def save_score(value):
+    try:
+        os.makedirs(STATE, exist_ok=True)
+        tmp = SCORE_FILE + ".tmp"
+        with open(tmp, "w") as f:
+            f.write(f"{value}\n")
+        os.replace(tmp, SCORE_FILE)
+    except OSError:
+        pass
+
+
+def render_row(pac, mouth_open, ghosts, scared, eaten):
+    cells = [" "] * ROW_WIDTH
+    for col in DOT_COLS:
+        if col not in eaten:
+            cells[col] = "\x1b[97m●" if col == PELLET else "\x1b[90m·"
+    for i, col in enumerate(ghosts):
+        if 0 <= col < ROW_WIDTH:
+            cells[col] = f"\x1b[{SCARED if scared else GHOST_COLORS[i]}m{GHOST}"
+    if pac < ROW_WIDTH:
+        cells[pac] = f"\x1b[{PAC_COLOR}m{PAC if mouth_open else SHUT}"
+    return "".join(cells) + "\x1b[0m\x1b[K"
+
+
+def animate(up_row, up_score, start):
+    """Run Pac-Man along the row `up_row` lines above the cursor; count the score on `up_score`."""
+    w = sys.stdout.write
+    eaten, gained, scared = set(), 0, False
+    ghosts = GHOST_COLS[:]
+    w("\x1b[?25l")                                   # hide the cursor while drawing
+    try:
+        path = list(range(PAC_COL, DOT_COLS[-1] + 2))
+        for step, pac in enumerate(path):
+            if pac in DOT_COLS and pac not in eaten:
+                eaten.add(pac)
+                gained += 50 if pac == PELLET else 10
+                scared = scared or pac == PELLET
+            # ghosts chase one step behind Pac-Man; after the pellet they turn grey and run back
+            ghosts = [g - 1 for g in ghosts] if scared else [g + 1 for g in ghosts]
+            row = render_row(pac, step % 2 == 0 or step == len(path) - 1, ghosts, scared, eaten)
+            w(f"\x1b[{up_row}A\r{row}\x1b[{up_row}B\r")
+            w(f"\x1b[{up_score}A\x1b[{SCORE_COL + 1}G\x1b[1;97m{start + gained:06d}\x1b[0m\x1b[{up_score}B\r")
+            sys.stdout.flush()
+            time.sleep(FRAME)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        w("\x1b[0m\x1b[?25h")
+        sys.stdout.flush()
+    return gained
+
+
+def main():
+    fastfetch = shutil.which("fastfetch")
+    if not fastfetch:
+        return
+    start = read_score()
+    out = subprocess.run([fastfetch, "--pipe", "false", *sys.argv[1:]],
+                         capture_output=True, text=True).stdout
+    sys.stdout.write(out)
+    sys.stdout.flush()
+
+    lines = out.split("\n")
+    if lines and lines[-1] == "":
+        lines.pop()                                  # the cursor now sits on the line after the last one
+    plain = [ANSI.sub("", line) for line in lines]
+    row = next((i for i, l in enumerate(plain) if PAC in l and "·" in l), None)
+    label = next((i for i, l in enumerate(plain) if "1UP" in l and "HI-SCORE" in l), None)
+    points = 10 * (len(DOT_COLS) - 1) + 50
+
+    size = shutil.get_terminal_size((80, 24))
+    can_animate = (
+        row is not None and label is not None and sys.stdout.isatty()
+        and not os.environ.get("ARCADE_NO_ANIM")
+        and size.columns >= 60                       # narrower and the lines wrap, moving the row
+        and len(lines) - (label + 1) < size.lines    # the score line is still on screen
+    )
+    if can_animate:
+        points = animate(len(lines) - row, len(lines) - (label + 1), start)
+    save_score(start + points)
+
+
+if __name__ == "__main__":
+    main()

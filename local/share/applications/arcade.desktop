@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Arcade
+Comment=Pac-Man in the terminal; your best game is the HI-SCORE on the greeting
+Exec=sh -c 'exec kitty --class arcade --title Arcade -o initial_window_width=50c -o initial_window_height=17c ~/.local/bin/play'
+Icon=applications-games
+Terminal=false
+Categories=Game;ArcadeGame;
+Keywords=pacman;game;arcade;play;
