@@ -46,6 +46,9 @@ require("conf.env")
 --   hl.monitor({ output = "HDMI-A-1", mode = "3840x2160@60", position = "2560x0", scale = 1.5 })
 --   hl.monitor({ output = "DP-2", mode = "2560x1440@180", position = "0x0", scale = 1, vrr = 2 })
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1 })
+hl.monitor({ output = "DP-2", mode = "2560x1440@240", position = "0x0", scale = 1.25, vrr = 2 })
+hl.monitor({ output = "HDMI-A-1", mode = "1920x1080@144", position = "-1080x-384", scale = 1, transform = 1 })
+hl.config({ xwayland = { force_zero_scaling = true } })
 
 -- -------------------------------------------------------------------- look --
 -- Gradients are tables here: the hyprlang form "rgb(a) rgb(b) 45deg" is

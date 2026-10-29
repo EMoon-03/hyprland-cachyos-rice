@@ -8,6 +8,7 @@
 // Power and settings live in the control centre's header now.
 {
   "layer": "top",
+  "output": "DP-2",
   "position": "top",
   "height": 42,
   "spacing": 0,

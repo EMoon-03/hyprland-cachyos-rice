@@ -7,3 +7,8 @@
 -- through a reload; move them with
 --   hyprctl dispatch 'hl.dsp.workspace.move({ workspace = 1, monitor = "DP-1" })'
 hl.workspace_rule({ workspace = "1", default_name = "main", layout_opts = { orientation = "left" } })
+
+-- Workspaces 1-5 on the main monitor, 6-10 on the vertical one
+for i = 1, 10 do
+    hl.workspace_rule({ workspace = tostring(i), monitor = (i <= 5) and "DP-2" or "HDMI-A-1" })
+end

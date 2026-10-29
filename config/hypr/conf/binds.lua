@@ -12,12 +12,10 @@ local exec, dsp = hl.dsp.exec_cmd, hl.dsp
 local bin     = "~/.local/bin"          -- not on the session PATH - always spell it out
 local term    = "kitty"
 local files   = "thunar"
-local browser = "firefox"
+local browser = "vivaldi"
 
 -- ------------------------------------------------------------------- apps --
 bind("SUPER + RETURN",         exec("steam"))
-bind("SUPER + C",              exec(bin .. "/open-chess.sh"))     -- chess.com, floating on workspace 1
-bind("SUPER + SHIFT + C",      exec("gnome-chess"))               -- offline chess against the GNU Chess bot
 bind("SUPER + T",              exec(term))
 bind("CTRL + ALT + DELETE",    exec(term .. " --class taskmgr -e btop"))
 bind("SUPER + SPACE",          exec("qs -c rice ipc call menu toggle"))              -- rice menu: apps, capture, style, settings, tools, system
@@ -57,11 +55,6 @@ bind("CTRL + Print",           exec([[grim -g "$(slurp)" - | satty -f -]]))
 bind("F8",                     exec(bin .. "/gsr-replay-save"))         -- save the last 3 min of the replay buffer
 
 -- ---------------------------------------------------- reading back / focus --
-bind("SUPER + P",              exec(bin .. "/read-aloud.sh --toggle"))
-bind("SUPER + bracketleft",    exec(bin .. "/read-aloud.sh --back"))
-bind("SUPER + bracketright",   exec(bin .. "/read-aloud.sh --forward"))
-bind("SUPER + SHIFT + R",      exec(bin .. "/read-aloud.sh --selection"))
-bind("SUPER + SHIFT + P",      exec(bin .. "/read-aloud.sh --stop"))
 bind("SUPER + F",              exec(bin .. "/hypr-focus.sh"))
 
 -- ------------------------------------------------------- windows (vim keys) --
