@@ -13,7 +13,7 @@ import shutil
 import subprocess
 from urllib.parse import quote
 
-HOME = os.path.expanduser("~")
+HOME = os.path.normpath(os.path.expanduser("~"))
 CONF = os.environ.get("XDG_CONFIG_HOME") or os.path.join(HOME, ".config")
 
 
@@ -22,11 +22,13 @@ def uri(path):
 
 
 def xdg(name, fallback):
+    """Folder for an XDG name. A folder you don't have comes back as your home,
+    often as "$HOME/" with a slash - normpath makes that compare equal to HOME."""
     try:
         p = subprocess.run(["xdg-user-dir", name], capture_output=True, text=True).stdout.strip()
-        return p or os.path.join(HOME, fallback)
     except OSError:
-        return os.path.join(HOME, fallback)
+        p = ""
+    return os.path.normpath(p or os.path.join(HOME, fallback))
 
 
 # ---- sidebar bookmarks -------------------------------------------------------
