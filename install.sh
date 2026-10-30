@@ -142,8 +142,10 @@ if command -v pacman >/dev/null; then
           adw-gtk-theme qt6ct papirus-icon-theme)
     mapfile -t missing < <(pacman -T "${pkgs[@]}" || true)
     command -v fc-list >/dev/null || missing+=(fontconfig)
-    if ! fc-list 2>/dev/null | grep -q "JetBrainsMono Nerd Font"; then missing+=(ttf-jetbrains-mono-nerd); fi
-    if ! fc-list 2>/dev/null | grep -q "Inter Variable"; then missing+=(inter-font); fi
+    # read the list first: "fc-list | grep -q" fails under pipefail once grep stops reading
+    fonts="$(fc-list : family 2>/dev/null || true)"
+    [[ "$fonts" == *"JetBrainsMono Nerd Font"* ]] || missing+=(ttf-jetbrains-mono-nerd)
+    [[ "$fonts" == *"Inter"* ]] || missing+=(inter-font)
     if (( ${#missing[@]} )); then
         echo "  missing:  sudo pacman -S --needed ${missing[*]}"
     else
