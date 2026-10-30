@@ -55,15 +55,43 @@ Scope {
         return all.filter(e => !gone.some(g => e.id === g || e.id.startsWith(g + ".")))
     }
 
+    // Apps come in sections (Eddie). Each app goes in the first section, in
+    // `pick` order, whose categories its .desktop file lists; anything else is
+    // "System & tools". `order` is how the sections are listed.
+    readonly property var appSections: [
+        { key: "internet",    label: "Internet",       icon: "globe",     pick: 5, cats: ["WebBrowser", "Network", "Email", "Chat", "InstantMessaging", "VideoConference"] },
+        { key: "games",       label: "Games",          icon: "swords",    pick: 1, cats: ["Game"] },
+        { key: "media",       label: "Media",          icon: "film",      pick: 4, cats: ["AudioVideo", "Audio", "Video", "Player", "Graphics", "Photography"] },
+        { key: "development", label: "Development",    icon: "terminal",  pick: 2, cats: ["Development", "IDE"] },
+        { key: "office",      label: "Office",         icon: "book-open", pick: 3, cats: ["Office"] },
+        { key: "system",      label: "System & tools", icon: "wrench",    pick: 6, cats: [] }
+    ]
+
+    function sectionOf(categories) {
+        const have = categories || []
+        const byPick = appSections.slice().sort((a, b) => a.pick - b.pick)
+        for (const s of byPick)
+            if (s.cats.some(c => have.indexOf(c) >= 0))
+                return s.key
+        return "system"
+    }
+
     readonly property var apps: {
         const seen = {}
         return DesktopEntries.applications.values
             .filter(a => !a.noDisplay && !seen[a.id] && (seen[a.id] = true))
-            .sort((a, b) => a.name.localeCompare(b.name))
+            .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))   // A-Z, ignoring case
             .map(a => ({ id: "app:" + a.id, label: a.name, hint: a.genericName || a.comment || "",
-                         appIcon: a.icon || "application-x-executable", app: a,
+                         appIcon: a.icon || "application-x-executable", app: a, section: sectionOf(a.categories),
                          keywords: (a.keywords || []).join(" ") + " " + (a.categories || []).join(" ") }))
     }
+
+    // The section rows inside Apps (empty sections are left out).
+    readonly property var appSectionRows: appSections
+        .map(s => ({ id: "apps." + s.key, parent: "apps", label: s.label, icon: s.icon,
+                     source: "appsection", section: s.key, n: apps.filter(a => a.section === s.key).length }))
+        .filter(r => r.n > 0)
+        .map(r => Object.assign(r, { hint: r.n + (r.n === 1 ? " app" : " apps") }))
 
     // Named themes (rice-theme list --json), re-read on every open.
     property var themeList: []
@@ -97,7 +125,7 @@ Scope {
     }
 
     function find(id) {
-        return items.find(e => e.id === id) || null
+        return items.find(e => e.id === id) || appSectionRows.find(e => e.id === id) || null
     }
 
     function isMenu(e) {
@@ -111,7 +139,9 @@ Scope {
     function childrenOf(id) {
         const e = find(id)
         if (e && e.source === "apps")
-            return apps
+            return appSectionRows
+        if (e && e.source === "appsection")
+            return apps.filter(a => a.section === e.section)
         return items.filter(c => c.parent === id && shown(c))
     }
 
@@ -148,8 +178,10 @@ Scope {
             if (shown(e))
                 consider(e, trail(e))
         const appsLabel = (find("apps") || { label: "Apps" }).label
-        for (const a of apps)
-            consider(a, appsLabel)
+        for (const a of apps) {
+            const s = appSections.find(x => x.key === a.section)
+            consider(a, appsLabel + (s ? " › " + s.label : ""))
+        }
         // Themes are searchable here too; picking one applies it straight away.
         const themesAt = find("style.theme")
         for (const t of themes)

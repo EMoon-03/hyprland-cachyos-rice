@@ -23,7 +23,7 @@
 // file, with each child submenu as one of its sections.
 [
   // ------------------------------------------------------------------ apps --
-  { "id": "apps", "icon": "layout-grid", "label": "Apps", "hint": "everything rofi lists", "source": "apps" },
+  { "id": "apps", "icon": "layout-grid", "label": "Apps", "hint": "by section · type to search all", "source": "apps" },
 
   // --------------------------------------------------------------- capture --
   { "id": "capture", "icon": "camera", "label": "Capture", "hint": "screenshots, recording, replays" },
