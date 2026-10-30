@@ -37,3 +37,23 @@ rice.bind("SUPER + SHIFT + E", dsp.exec_cmd(
 --   SUPER + E    Thunar (mouse: drag and drop, drives, "show in folder")
 --   SUPER + Y    Yazi (keyboard, with previews); T inside Yazi opens Thunar there
 rice.bind("SUPER + Y", dsp.exec_cmd("kitty --class yazi -e yazi"))
+
+-- Thunar's pop-ups open where you clicked, not in the middle of the screen ----
+-- (confirm "empty trash?", rename, properties... and the copy/delete progress
+-- window, which would otherwise take a whole tile). Kept fully on screen.
+local at_cursor = {
+    "max(min(cursor_x-(window_w*0.5),monitor_w-window_w),0)",
+    "max(min(cursor_y-(window_h*0.5),monitor_h-window_h),0)",
+}
+hl.window_rule({
+    name  = "thunar-dialogs-at-cursor",
+    match = { class = "^([Tt]hunar)$", float = true },
+    move  = at_cursor,
+})
+hl.window_rule({
+    name  = "thunar-progress-small",
+    match = { class = "^([Tt]hunar)$", title = "^(File Operation Progress)$" },
+    float = true,
+    size  = { 460, 140 },
+    move  = at_cursor,
+})
