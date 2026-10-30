@@ -151,7 +151,8 @@ is no longer read: make them again, and they are saved as `conf.d/*.lua`.
 | `Super+Enter` | Steam |
 | `Super+Q` / `Super+Shift+Q` | close window / exit Hyprland |
 | `Super+G` / `Super+S` / `Super+A` | float / fullscreen / flip the split |
-| `Super+H J K L` or arrows | move focus (`+Ctrl` swap, `+Shift` resize) |
+| `Super+H J K L` or arrows | move focus |
+| `Super+Ctrl+arrows` / `Super+Shift+arrows` | swap with the neighbour / resize |
 | `Super+1..0` / `Super+Shift+1..0` | go to / move to workspace |
 | `Super+M` / `Super+Tab` | previous workspace / next window |
 | `Super+D` | dashboard |
