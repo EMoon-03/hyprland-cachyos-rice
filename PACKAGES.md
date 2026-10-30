@@ -11,8 +11,8 @@ sudo pacman -S --needed \
   waybar rofi awww matugen quickshell \
   kitty grim slurp satty wl-clipboard cliphist brightnessctl playerctl wireplumber \
   pavucontrol nm-connection-editor hyprsunset gpu-screen-recorder \
-  jq curl git socat imagemagick libnotify python python-gobject python-numpy python-pillow gtk-layer-shell \
-  cava fastfetch btop thunar tumbler gvfs upower power-profiles-daemon github-cli \
+  jq curl git imagemagick libnotify python python-numpy python-pillow \
+  cava fastfetch btop thunar tumbler gvfs udiskie yazi github-cli \
   adw-gtk-theme qt6ct nwg-look papirus-icon-theme ttf-jetbrains-mono-nerd inter-font
 ```
 
@@ -36,17 +36,16 @@ Plus `bibata-cursor-theme-bin` from the AUR, or change `XCURSOR_THEME` in
 | `wl-clipboard`, `cliphist` | clipboard history |
 | `wireplumber`, `playerctl`, `brightnessctl` | media keys and the OSD |
 | `hyprsunset` | Night Light |
-| `upower`, `power-profiles-daemon` | Energy card and power profiles |
 | `imagemagick` | the terminal greeting's logo |
 | `jq`, `curl` | wallhaven search, settings menus, weather |
-| `socat`, `python-gobject`, `gtk-layer-shell` | read-aloud and its subtitle tile |
 | `cava` | desktop visualiser |
 | `github-cli` | the dashboard's GitHub tab (`gh auth login` once) |
+| `udiskie` | USB drives mount on plugging in; SUPER + SHIFT + E ejects them |
+| `yazi` | keyboard file manager (SUPER + Y) |
 | `thunar`, `tumbler`, `gvfs` | file manager: "show in folder" from screenshots and the GitHub tab, thumbnails, trash and drives |
 | `adw-gtk-theme`, `qt6ct`, `nwg-look` | GTK and Qt apps following the palette |
 
-Services the control centre expects: NetworkManager, bluetooth (`bluez`) and
-power-profiles-daemon, all enabled.
+Service the control centre expects: NetworkManager, enabled.
 
 ## Optional
 
