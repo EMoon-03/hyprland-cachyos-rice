@@ -7,6 +7,11 @@
 #   side-monitor toggle       the other one        (SUPER + SHIFT + O)
 #   side-monitor status       which one is on
 #
+#   side-monitor wallpaper <image>   its own picture while it's portrait
+#                                    (or right-click an image in Thunar)
+#   side-monitor wallpaper clear     back to the main wallpaper
+#   In landscape it shows the main wallpaper, like the main monitor.
+#
 # Either way it sits centred against the main monitor's left edge, and
 # workspaces 6-10 stay on it. The choice is saved in
 # ~/.config/hypr/conf.d/40-side-monitor.lua, so it survives a reboot.
@@ -15,6 +20,7 @@ set -euo pipefail
 OUT="${SIDE_OUTPUT:-HDMI-A-1}"
 MODE_STR="${SIDE_MODE:-1920x1080@144}"
 FILE="$HOME/.config/hypr/conf.d/40-side-monitor.lua"
+SIDE_WALL="$HOME/.config/rice/side-wallpaper"     # path of the portrait picture
 
 current() {
     if [[ -f "$FILE" ]] && grep -q 'transform = 0' "$FILE"; then echo landscape; else echo portrait; fi
@@ -47,9 +53,37 @@ LUA
     echo "side monitor: $want"
 }
 
+own_wallpaper() {   # the side picture, if it's set, exists and the monitor is portrait
+    local f
+    [[ "$(current)" == portrait && -f "$SIDE_WALL" ]] || return 1
+    f="$(cat "$SIDE_WALL")"
+    [[ -f "$f" ]] && printf '%s\n' "$f"
+}
+
 case "${1:-status}" in
     portrait|landscape) apply "$1" ;;
     toggle)  [[ "$(current)" == portrait ]] && apply landscape || apply portrait ;;
     status)  current ;;
-    *)       sed -n '2,12s/^# \{0,1\}//p' "$0"; exit 2 ;;
+    own-wallpaper-output)                      # for rice-wallpaper: which output to skip
+        own_wallpaper >/dev/null && echo "$OUT" || true ;;
+    apply-wallpaper)                           # put the side picture up (rice-wallpaper calls this)
+        f="$(own_wallpaper)" || exit 0
+        awww img --outputs "$OUT" "$f" --resize crop --transition-type none ;;
+    wallpaper)
+        case "${2:-}" in
+            "") [[ -f "$SIDE_WALL" ]] && cat "$SIDE_WALL" || echo "(main wallpaper)" ;;
+            clear)
+                rm -f "$SIDE_WALL"
+                "$HOME/.local/bin/rice-wallpaper" restore >/dev/null 2>&1 || true
+                notify-send -a side-monitor -i video-display "Side monitor" "Back to the main wallpaper" 2>/dev/null || true ;;
+            *)
+                f="$(readlink -f -- "$2")"
+                [[ -f "$f" ]] || { echo "no such image: $2" >&2; exit 1; }
+                mkdir -p "$(dirname "$SIDE_WALL")"
+                printf '%s\n' "$f" > "$SIDE_WALL"
+                "$HOME/.local/bin/rice-wallpaper" restore >/dev/null 2>&1 || true
+                if [[ "$(current)" == portrait ]]; then msg="Wallpaper set"; else msg="Saved; it shows when the monitor is portrait"; fi
+                notify-send -a side-monitor -i video-display "Side monitor" "$msg" 2>/dev/null || true ;;
+        esac ;;
+    *)       sed -n '2,18s/^# \{0,1\}//p' "$0"; exit 2 ;;
 esac

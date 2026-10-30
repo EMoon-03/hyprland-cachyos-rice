@@ -8,7 +8,8 @@ it at every login (conf.d/50-eddie.lua), so a fresh install comes out the same.
               no duplicate home entry; Computer, Desktop and Browse Network
               hidden (anything else you hide with right-click stays hidden)
   thumbnails  for every file, not just local ones
-  right-click "Open in Yazi" on folders
+  right-click "Open in Yazi" on folders; "Set as wallpaper" and
+              "Set as side-monitor wallpaper" on pictures
 """
 import os
 import shutil
@@ -84,24 +85,29 @@ if shutil.which("xfconf-query"):
 
 # ---- right-click "Open in Yazi" ----------------------------------------------
 uca = os.path.join(CONF, "Thunar", "uca.xml")
-action = """<action>
-	<icon>system-file-manager</icon>
-	<name>Open in Yazi</name>
-	<submenu></submenu>
-	<unique-id>rice-open-in-yazi</unique-id>
-	<command>kitty --class yazi -e yazi %f</command>
-	<description>Browse this folder with Yazi</description>
-	<range></range>
-	<patterns>*</patterns>
-	<startup-notify/>
-	<directories/>
-</action>
-"""
+IMAGES = "*.jpg;*.jpeg;*.png;*.webp;*.JPG;*.JPEG;*.PNG;*.WEBP"
+actions = [  # (unique id, icon, name, command, patterns, appears on)
+    ("rice-open-in-yazi", "system-file-manager", "Open in Yazi",
+     "kitty --class yazi -e yazi %f", "*", "<directories/>"),
+    ("rice-set-wallpaper", "preferences-desktop-wallpaper", "Set as wallpaper",
+     "~/.local/bin/rice-wallpaper set %f", IMAGES, "<image-files/>"),
+    ("rice-set-side-wallpaper", "video-display", "Set as side-monitor wallpaper",
+     "~/.local/bin/side-monitor wallpaper %f", IMAGES, "<image-files/>"),
+]
 try:
     text = open(uca).read()
 except OSError:
     text = '<?xml version="1.0" encoding="UTF-8"?>\n<actions>\n</actions>\n'
-if "rice-open-in-yazi" not in text and "</actions>" in text:
+added = False
+for uid, icon, name, cmd, patterns, kind in actions:
+    if uid in text or "</actions>" not in text:
+        continue
+    block = (f"<action>\n\t<icon>{icon}</icon>\n\t<name>{name}</name>\n\t<submenu></submenu>\n"
+             f"\t<unique-id>{uid}</unique-id>\n\t<command>{cmd}</command>\n\t<description>{name}</description>\n"
+             f"\t<range></range>\n\t<patterns>{patterns}</patterns>\n\t<startup-notify/>\n\t{kind}\n</action>\n")
+    text = text.replace("</actions>", block + "</actions>", 1)
+    added = True
+if added:
     os.makedirs(os.path.dirname(uca), exist_ok=True)
     with open(uca, "w") as f:
-        f.write(text.replace("</actions>", action + "</actions>", 1))
+        f.write(text)

@@ -106,17 +106,28 @@ theme() {
     fi
 }
 
+# Outputs that get the main wallpaper: all of them ("" = awww's default), except
+# the side monitor while it shows its own portrait picture (side-monitor wallpaper).
+main_outputs() {
+    local side
+    side="$("$HOME/.local/bin/side-monitor" own-wallpaper-output 2>/dev/null)" || side=""
+    [[ -n "$side" ]] || return 0
+    hyprctl monitors -j 2>/dev/null | jq -r --arg s "$side" '[.[].name | select(. != $s)] | join(",")'
+}
+
 show() {   # show <file> none|wipe
-    local f
+    local f outs
     f="$(readlink -f -- "$1")"
     [[ -f "$f" ]] || die "no such file: $1"
     daemon
+    outs="$(main_outputs)"
     if [[ "$2" == none ]]; then
-        awww img "$f" --resize crop --transition-type none
+        awww img ${outs:+--outputs "$outs"} "$f" --resize crop --transition-type none
     else
-        awww img "$f" --resize crop --transition-type wipe --transition-angle 30 \
+        awww img ${outs:+--outputs "$outs"} "$f" --resize crop --transition-type wipe --transition-angle 30 \
             --transition-duration 1.1 --transition-fps 120 --transition-bezier .19,1,.22,1
     fi
+    "$HOME/.local/bin/side-monitor" apply-wallpaper >/dev/null 2>&1 || true
     ln -sfn "$f" "$CURRENT"
     if in_theme "$f"; then
         mkdir -p "$CACHE/theme-bg"
