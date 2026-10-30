@@ -1,0 +1,11 @@
+// Let wheel users mount, unmount, eject and power off REMOVABLE drives (USB
+// sticks, SD cards) without a password. Internal disks keep asking: those use
+// the separate *-system actions, which this rule leaves alone.
+polkit.addRule(function (action, subject) {
+    var ok = ["org.freedesktop.udisks2.filesystem-mount",
+              "org.freedesktop.udisks2.filesystem-unmount-others",
+              "org.freedesktop.udisks2.eject-media",
+              "org.freedesktop.udisks2.power-off-drive"];
+    if (ok.indexOf(action.id) >= 0 && subject.isInGroup("wheel") && subject.local && subject.active)
+        return polkit.Result.YES;
+});

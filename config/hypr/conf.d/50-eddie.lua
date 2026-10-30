@@ -18,3 +18,16 @@ rice.bind("SUPER + Z", function()
 end)
 rice.bind("SUPER + SHIFT + Z", dsp.workspace.toggle_special("minimized"))
 rice.bind("SUPER + ALT + Z", dsp.window.move({ workspace = "e+0" }))  -- out of the special workspace
+
+-- USB drives ------------------------------------------------------------------
+--   plugged in           mounted for you, with a notification (udiskie)
+--   SUPER + SHIFT + E    eject every USB drive; a notification says when it's
+--                        safe to pull out (or use the ⏏ next to it in Thunar)
+if not os.getenv("RICE_NO_AUTOSTART") then
+    hl.on("hyprland.start", function()
+        hl.exec_cmd("sh -c 'command -v udiskie >/dev/null && exec udiskie --no-tray --automount --notify'")
+    end)
+end
+rice.bind("SUPER + SHIFT + E", dsp.exec_cmd(
+    "sh -c 'udiskie-umount -a --detach && notify-send -i drive-removable-media \"USB\" \"Safe to unplug\" "
+ .. "|| notify-send -u critical -i drive-removable-media \"USB still in use\" \"Close anything open on the drive, then try again\"'"))
