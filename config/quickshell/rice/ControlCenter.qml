@@ -1,14 +1,13 @@
 // Control centre, modelled on Nisfere's: a panel hanging from the bar with a
 // grid of glass toggle cards, volume and mic sliders, and detail pages for
-// Wi-Fi, Ethernet and sound devices. (Bluetooth page removed: no Bluetooth on this PC.)
+// Ethernet and sound devices. (Wi-Fi, Bluetooth and Energy removed: a wired desktop.)
 //
 //   qs -c rice ipc call controlcenter toggle      (the bar's network/volume pill)
 //
 // Where each card gets its state:
-//   Wi-Fi, Ethernet   Quickshell.Networking (NetworkManager)
+//   Ethernet          Quickshell.Networking (NetworkManager)
 //   volume, mic       Quickshell.Services.Pipewire - needs a PwObjectTracker,
 //                     or the nodes' audio properties never go live
-//   Energy            Quickshell.Services.UPower power profiles
 //   theme             `rice-wallpaper mode`, state in ~/.cache/rice/mode
 //   Do Not Disturb    NotifService (Quickshell is the notification daemon)
 //   Night Light       hyprsunset, running or not
@@ -22,13 +21,12 @@ import Quickshell.Wayland
 import Quickshell.Hyprland
 import Quickshell.Networking
 import Quickshell.Services.Pipewire
-import Quickshell.Services.UPower
 
 Scope {
     id: root
 
     property bool open: false
-    property string page: "main"          // main | wifi | ethernet | sound
+    property string page: "main"          // main | ethernet | sound
     property var targetScreen: null
     property var visualiser: null          // wired up by shell.qml
 
@@ -65,15 +63,7 @@ Scope {
     }
 
     // ------------------------------------------------------------ network --
-    readonly property var wifiDevice: firstDevice(DeviceType.Wifi)
     readonly property var wiredDevice: firstDevice(DeviceType.Wired)
-    readonly property var wifiNetworks: wifiDevice ? Array.from(wifiDevice.networks.values) : []
-    readonly property var wifiCurrent: {
-        for (const n of wifiNetworks)
-            if (n.connected)
-                return n
-        return null
-    }
 
     function firstDevice(type) {
         const ds = Networking.devices.values
@@ -81,19 +71,6 @@ Scope {
             if (ds[i].type === type)
                 return ds[i]
         return null
-    }
-
-    function wifiIcon(strength) {
-        const s = strength > 1 ? strength / 100 : strength
-        return s >= 0.75 ? "wifi" : s >= 0.5 ? "wifi-high" : s >= 0.25 ? "wifi-low" : "wifi-zero"
-    }
-
-    // Scan only while the panel is open.
-    Binding {
-        target: root.wifiDevice
-        property: "scannerEnabled"
-        value: root.open
-        when: root.wifiDevice !== null
     }
 
     // -------------------------------------------------------------- audio --
@@ -120,17 +97,6 @@ Scope {
 
     function nodeName(node) {
         return node ? (node.description || node.nickname || node.name) : "No device"
-    }
-
-    // ------------------------------------------------------------- energy --
-    readonly property var profileNames: ["Power saver", "Balanced", "Performance"]
-
-    function cyclePower() {
-        const order = [PowerProfile.PowerSaver, PowerProfile.Balanced]
-        if (PowerProfiles.hasPerformanceProfile)
-            order.push(PowerProfile.Performance)
-        const i = order.indexOf(PowerProfiles.profile)
-        PowerProfiles.profile = order[(i + 1) % order.length]
     }
 
     // -------------------------------------------------------------- theme --
@@ -295,8 +261,7 @@ Scope {
                     anchors.right: parent.right
                     anchors.top: parent.top
                     anchors.margins: 18
-                    sourceComponent: root.page === "wifi" ? wifiPage
-                                   : root.page === "ethernet" ? ethernetPage
+                    sourceComponent: root.page === "ethernet" ? ethernetPage
                                    : root.page === "sound" ? soundPage
                                    : mainPage
                     onLoaded: {
@@ -382,20 +347,6 @@ Scope {
 
                 CcCard {
                     Layout.fillWidth: true
-                    visible: root.wifiDevice !== null
-                    icon: !Networking.wifiEnabled ? "wifi-off"
-                        : root.wifiCurrent ? root.wifiIcon(root.wifiCurrent.signalStrength) : "wifi"
-                    title: "Wi-Fi"
-                    active: root.wifiCurrent !== null
-                    subtitle: !Networking.wifiEnabled ? "Off"
-                        : root.wifiCurrent ? root.wifiCurrent.name : "Not connected"
-                    hasMore: true
-                    onClicked: Networking.wifiEnabled = !Networking.wifiEnabled
-                    onMoreClicked: root.page = "wifi"
-                }
-
-                CcCard {
-                    Layout.fillWidth: true
                     icon: "palette"
                     title: root.mode === "dark" ? "Dark Theme" : "Light Theme"
                     subtitle: "Appearance"
@@ -438,16 +389,6 @@ Scope {
                     active: root.nightLight
                     subtitle: root.nightLight ? `On · ${root.nightTemperature}K` : "Off"
                     onClicked: root.toggleNightLight()
-                }
-
-                CcCard {
-                    Layout.fillWidth: true
-                    icon: PowerProfiles.profile === PowerProfile.PowerSaver ? "leaf"
-                        : PowerProfiles.profile === PowerProfile.Performance ? "zap" : "gauge"
-                    title: "Energy"
-                    active: PowerProfiles.profile === PowerProfile.Performance
-                    subtitle: root.profileNames[PowerProfiles.profile] ?? "Balanced"
-                    onClicked: root.cyclePower()
                 }
             }
 
@@ -529,13 +470,6 @@ Scope {
                     }
                 }
             }
-        }
-    }
-
-    Component {
-        id: wifiPage
-        CcWifiPage {
-            cc: root
         }
     }
 

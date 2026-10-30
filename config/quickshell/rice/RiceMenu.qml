@@ -14,7 +14,6 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Hyprland
-import Quickshell.Services.UPower
 
 Scope {
     id: root
@@ -324,14 +323,12 @@ Scope {
         onLoaded: root.mode = text().trim() === "light" ? "light" : "dark"
     }
 
-    readonly property var profileNames: ["Power saver", "Balanced", "Performance"]
 
     function valueOf(e) {
         switch (e.value) {
         case "visualiser": return visualiser && visualiser.enabled ? "On" : "Off"
         case "clock":      return clock && clock.enabled ? "On" : "Off"
         case "lyrics":     return lyrics && lyrics.enabled ? "On" : "Off"
-        case "power":      return profileNames[PowerProfiles.profile] ?? "…"
         case "mode":       return mode === "light" ? "Light" : "Dark"
         case "theme":      return (themeList.find(t => t.current) || { name: "" }).name
         case "recording":  return capture && capture.recording ? capture.elapsedText : ""
@@ -362,13 +359,6 @@ Scope {
         case "mode.toggle":
             mode = mode === "dark" ? "light" : "dark"     // the file confirms it
             return Quickshell.execDetached([home + "/.local/bin/rice-wallpaper", "mode", mode])
-        case "power.cycle": {
-            const order = [PowerProfile.PowerSaver, PowerProfile.Balanced]
-            if (PowerProfiles.hasPerformanceProfile)
-                order.push(PowerProfile.Performance)
-            PowerProfiles.profile = order[(order.indexOf(PowerProfiles.profile) + 1) % order.length]
-            return
-        }
         }
         console.warn("RiceMenu: unknown action " + name)
     }

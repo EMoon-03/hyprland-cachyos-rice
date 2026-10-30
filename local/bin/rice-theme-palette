@@ -8,8 +8,8 @@
       role not mapped here, so no template ever finds a hole.
 
   rice-theme-palette terminal <colors.toml>
-      Overwrite the 16 ANSI colours in kitty's and foot's generated colour files
-      with the theme's own, the way Omarchy's kitty/foot templates map them
+      Overwrite the 16 ANSI colours in kitty's generated colour file
+      with the theme's own, the way Omarchy's kitty template maps them
       (color0 background, 1-6 red..cyan, 7 foreground, 8 muted, 9-15 bright).
       The Material roles have no slot for these.
 
@@ -165,9 +165,6 @@ def cmd_terminal(toml_path):
         f"{conf}/kitty/colors.conf": [(rf"^color{i}\s+\S+", f"color{i}  {c}") for i, c in enumerate(ansi)]
             + [(r"^selection_background\s+\S+", "selection_background " + t["selection"]),
                (r"^selection_foreground\s+\S+", "selection_foreground " + t["foreground"])],
-        f"{conf}/foot/colors.ini": [(rf"^{'regular' if i < 8 else 'bright'}{i % 8}=\S+",
-                                     f"{'regular' if i < 8 else 'bright'}{i % 8}={c.lstrip('#')}")
-                                    for i, c in enumerate(ansi)],
     }
     for path, subs in edits.items():
         try:

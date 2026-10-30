@@ -20,8 +20,6 @@ bind("SUPER + T",              exec(term))
 bind("CTRL + ALT + DELETE",    exec(term .. " --class taskmgr -e btop"))
 bind("SUPER + SPACE",          exec("qs -c rice ipc call menu toggle"))              -- rice menu: apps, capture, style, settings, tools, system
 bind("SUPER + R",              exec("rofi -show drun -theme ~/.config/rofi/launcher.rasi"))   -- plain app launcher
-bind("SUPER + SHIFT + SPACE",  exec("rofi -show filebrowser -theme ~/.config/rofi/launcher.rasi"))
-bind("CTRL + SHIFT + SPACE",   exec("rofi -show filebrowser -theme ~/.config/rofi/launcher.rasi"))
 bind("SUPER + E",              exec(files))
 bind("SUPER + B",              exec(browser))
 bind("SUPER + Q",              dsp.window.close())

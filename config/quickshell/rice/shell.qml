@@ -124,7 +124,7 @@ ShellRoot {
         function toggle(): void { shell.closeOthers(cc); cc.toggle() }
         function open(): void { shell.closeOthers(cc); cc.show() }
         function close(): void { cc.close() }
-        // wifi | ethernet | sound
+        // ethernet | sound
         function page(name: string): void { shell.closeOthers(cc); cc.show(); cc.page = name }
     }
 

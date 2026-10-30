@@ -129,11 +129,7 @@ show() {   # show <file> none|wipe
     fi
     theme "$f"
     "$HOME/.local/bin/rice-theme-reload"
-    greeter_sync
 }
-
-# The login screen follows too; a no-op unless auto-sync is on (see the script).
-greeter_sync() { setsid -f "$HOME/.local/bin/rice-greeter-sync" --auto >/dev/null 2>&1; }
 
 index_of_current() {   # prints -1 when the current image is not in the folder
     local cur i; cur="$(current)"
@@ -200,7 +196,6 @@ case "${1:-}" in
         [[ -f "$f" ]] || die "no wallpaper to derive a palette from"
         theme "$f"
         "$HOME/.local/bin/rice-theme-reload"
-        greeter_sync
         ;;
     *)
         sed -n '2,/^$/s/^# \{0,1\}//p' "$0"

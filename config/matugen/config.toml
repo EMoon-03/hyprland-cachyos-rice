@@ -37,10 +37,6 @@ output_path = "~/.config/rofi/colors.rasi"
 input_path = "~/.config/matugen/templates/kitty.conf"
 output_path = "~/.config/kitty/colors.conf"
 
-[templates.foot]
-input_path = "~/.config/matugen/templates/foot.ini"
-output_path = "~/.config/foot/colors.ini"
-
 [templates.gtk3]
 input_path = "~/.config/matugen/templates/gtk.css"
 output_path = "~/.config/gtk-3.0/colors.css"
@@ -71,11 +67,6 @@ output_path = "~/.config/cava/config"
 [templates.fastfetch]
 input_path = "~/.config/matugen/templates/fastfetch.jsonc"
 output_path = "~/.config/fastfetch/config.jsonc"
-
-# The login screen: rice-greeter-sync stages this for noctalia-greeter.
-[templates.greeter]
-input_path = "~/.config/matugen/templates/greeter-palette.toml"
-output_path = "~/.cache/rice/greeter-palette.toml"
 
 # The Quickshell overlays (carousel, keybind menu) watch this file themselves.
 [templates.quickshell]
