@@ -58,6 +58,33 @@ hl.window_rule({
     move  = at_cursor,
 })
 
+-- Apps open where they belong ------------------------------------------------
+--   side monitor:  Discord on 6, YouTube Music on 7, btop (CTRL + ALT + DELETE) on 8
+--   main monitor:  Vivaldi, on whichever main workspace is showing
+--   Steam and games already go to workspace 1, fullscreen (conf/rules.lua)
+-- Only where a window first opens; move it anywhere afterwards as usual.
+-- If an app doesn't land there, `hyprctl clients | grep class` shows its real name.
+hl.window_rule({
+    name      = "discord-to-side",
+    match     = { class = "(?i)^(discord|vesktop|legcord|webcord)$" },
+    workspace = "6",
+})
+hl.window_rule({
+    name      = "music-to-side",   -- Pear Desktop / YouTube Music app, or Vivaldi's web-app version
+    match     = { class = [[(?i)^(.*youtube[-_ .]?music.*|.*pear[-_ .]?desktop.*|.*music\.youtube\.com.*)$]] },
+    workspace = "7",
+})
+hl.window_rule({
+    name      = "btop-to-side",
+    match     = { class = "^(taskmgr|btop)$" },
+    workspace = "8",
+})
+hl.window_rule({
+    name    = "vivaldi-on-main",
+    match   = { class = "(?i)^vivaldi(-stable)?$" },
+    monitor = "DP-2",
+})
+
 -- Side monitor ----------------------------------------------------------------
 --   SUPER + SHIFT + O    portrait <-> landscape, after you turn it (side-monitor)
 rice.bind("SUPER + SHIFT + O", dsp.exec_cmd("~/.local/bin/side-monitor toggle"))
