@@ -92,9 +92,8 @@ cd ~/hyprland-cachyos-rice
 ```
 
 Every file is **symlinked** into `~/.config` and `~/.local/bin`, one file at a
-time, so the clone is your live config. Edit it in place, and `git pull` for
-updates. Anything already in the way is moved aside as
-`<name>.pre-newrice-<date>`; nothing is deleted.
+time, so the clone is your live config: edit it in place. Anything already in
+the way is moved aside as `<name>.pre-newrice-<date>`; nothing is deleted.
 
 `--apply` also makes a first palette (from `#7dcfff` until you pick a theme or
 a wallpaper), points btop at the generated theme, sets the GTK, icon and cursor
@@ -103,6 +102,17 @@ themes, and runs `Hyprland --verify-config`.
 To undo it: `./install.sh --uninstall` (dry run), then
 `./install.sh --uninstall --apply`, which removes the links and restores
 whatever was moved aside.
+
+**Updating:** pull, then run the installer again. Changes to existing files
+take effect through the links, but a file that is new in the update (a new
+script in `local/bin`, say) is only linked by `--apply`. Running it again is
+safe.
+
+```bash
+cd ~/.local/share/hyprland-cachyos-rice
+git pull     # if it refuses: git fetch origin && git reset --hard origin/main
+./install.sh --apply
+```
 
 **Upgrading from the hyprlang version** (before September 2026, when the
 Hyprland config was `hyprland.conf`): `git pull`, then `./install.sh --apply`
@@ -275,6 +285,15 @@ qs -c rice ipc call <target> <function>
 - **`hyprctl keyword` is refused, or `hyprctl dispatch workspace 2` is a syntax
   error:** this rice uses Hyprland's Lua config (0.55 or newer). Use
   `hyprctl eval '<lua>'` and `hyprctl dispatch 'hl.dsp.focus({ workspace = 2 })'`.
+- **`Unknown command: ~/.local/bin/<something>`, or a key or right-click item
+  that does nothing after an update:** the new file isn't linked yet. Run
+  `./install.sh --apply` (see Updating).
+- **Two "Set as wallpaper" items when right-clicking an image in Thunar:** the
+  second comes from Thunar's own wallpaper plugin, which only works on XFCE and
+  GNOME. Remove it and keep pacman from putting it back:
+  `sudo rm /usr/lib/thunarx-3/thunar-wallpaper-plugin.so`, then
+  `sudo sed -i '/^\[options\]/a NoExtract = usr/lib/thunarx-3/thunar-wallpaper-plugin.so' /etc/pacman.conf`
+  and `thunar -q`.
 - **No notifications:** another daemon has the D-Bus name (see Install).
 - **Visualiser flat:** cava follows the *default* output. Check it with
   `wpctl status`.
