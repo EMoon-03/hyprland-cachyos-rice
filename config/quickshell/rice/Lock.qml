@@ -29,6 +29,17 @@ Scope {
     property string pending: ""
     property var previewScreen: null
 
+    // The lock screen shows on the main (biggest) monitor only; the others stay
+    // black. The black ones still take the password if the mouse is over them -
+    // typing there shows only dots, and Enter unlocks as usual.
+    readonly property string mainName: {
+        let best = null
+        for (const s of Quickshell.screens)
+            if (!best || s.width * s.height > best.width * best.height)
+                best = s
+        return best ? best.name : ""
+    }
+
     signal failed
 
     // Poll Steam only while the lock screen is up.
@@ -44,6 +55,9 @@ Scope {
         previewing = false
         stopPam()
         error = ""
+        // Keyboard focus follows the mouse while locked: start it on the main screen.
+        if (mainName)
+            Hyprland.dispatch('hl.dsp.focus({ monitor = "' + mainName + '" })')
         locked = true
     }
 
@@ -135,11 +149,60 @@ Scope {
         locked: root.locked
 
         WlSessionLockSurface {
+            id: lockSurface
             color: "black"
 
-            LockSurface {
+            readonly property bool isMain: !root.mainName || !lockSurface.screen || lockSurface.screen.name === root.mainName
+
+            Loader {
                 anchors.fill: parent
-                lock: root
+                active: lockSurface.isMain
+                sourceComponent: LockSurface {
+                    lock: root
+                }
+            }
+
+            Loader {
+                anchors.fill: parent
+                active: !lockSurface.isMain
+                sourceComponent: Item {
+                    TextInput {
+                        id: blindInput
+                        width: 0
+                        height: 0
+                        opacity: 0
+                        echoMode: TextInput.Password
+                        focus: true
+                        Component.onCompleted: forceActiveFocus()
+                        Keys.onReturnPressed: root.submit(text)
+                        Keys.onEnterPressed: root.submit(text)
+                        Keys.onEscapePressed: text = ""
+                    }
+
+                    Connections {
+                        target: root
+                        function onFailed() {
+                            blindInput.text = ""
+                        }
+                        function onLockedChanged() {
+                            blindInput.text = ""
+                        }
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        visible: blindInput.text.length > 0
+                        text: "\u2022".repeat(Math.min(blindInput.text.length, 24))
+                        color: "#808080"
+                        font.pixelSize: 28
+                        font.letterSpacing: 6
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: blindInput.forceActiveFocus()
+                    }
+                }
             }
         }
     }
