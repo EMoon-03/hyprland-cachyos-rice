@@ -98,7 +98,7 @@ Scope {
     // list of .desktop ids in ~/.config/rice/favorites.json; the starting set is
     // whichever of these are installed.
     readonly property string favFile: home + "/.config/rice/favorites.json"
-    property var favIds: ["vivaldi-stable", "vivaldi", "kitty", "thunar", "steam", "discord",
+    property var favIds: ["vivaldi-stable", "vivaldi", "kitty", "thunar", "yazi", "steam", "discord",
                           "youtube-music", "pear-desktop", "code-oss"]
     readonly property var favApps: favIds
         .map(id => apps.find(a => a.app.id === id))

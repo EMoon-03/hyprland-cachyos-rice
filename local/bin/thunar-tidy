@@ -1,0 +1,94 @@
+#!/usr/bin/env python3
+"""Keeps Thunar the way this rice wants it. Safe to run any time; Hyprland runs
+it at every login (conf.d/50-eddie.lua), so a fresh install comes out the same.
+
+  sidebar     Downloads, Documents, Pictures (+ Music, Videos if they exist);
+              no duplicate home entry; Computer, Desktop and Browse Network
+              hidden (anything else you hide with right-click stays hidden)
+  thumbnails  for every file, not just local ones
+  right-click "Open in Yazi" on folders
+"""
+import os
+import shutil
+import subprocess
+from urllib.parse import quote
+
+HOME = os.path.expanduser("~")
+CONF = os.environ.get("XDG_CONFIG_HOME") or os.path.join(HOME, ".config")
+
+
+def uri(path):
+    return "file://" + quote(path)
+
+
+def xdg(name, fallback):
+    try:
+        p = subprocess.run(["xdg-user-dir", name], capture_output=True, text=True).stdout.strip()
+        return p or os.path.join(HOME, fallback)
+    except OSError:
+        return os.path.join(HOME, fallback)
+
+
+# ---- sidebar bookmarks -------------------------------------------------------
+bm_file = os.path.join(CONF, "gtk-3.0", "bookmarks")
+os.makedirs(os.path.dirname(bm_file), exist_ok=True)
+try:
+    lines = [l.rstrip("\n") for l in open(bm_file) if l.strip()]
+except OSError:
+    lines = []
+home_uris = {uri(HOME), uri(HOME) + "/"}
+kept, seen = [], set()
+for line in lines:
+    u = line.split(" ", 1)[0]
+    if u in home_uris or u in seen:          # home is already in the sidebar; no duplicates
+        continue
+    seen.add(u)
+    kept.append(line)
+for name, fallback in [("DOWNLOAD", "Downloads"), ("DOCUMENTS", "Documents"), ("PICTURES", "Pictures"),
+                       ("MUSIC", "Music"), ("VIDEOS", "Videos")]:
+    p = xdg(name, fallback)
+    if p != HOME and os.path.isdir(p) and uri(p) not in seen:
+        seen.add(uri(p))
+        kept.append(uri(p))
+if kept != lines:
+    with open(bm_file, "w") as f:
+        f.write("\n".join(kept) + "\n")
+
+# ---- Thunar settings (xfconf) ------------------------------------------------
+if shutil.which("xfconf-query"):
+    def q(*args):
+        return subprocess.run(["xfconf-query", "-c", "thunar", *args], capture_output=True, text=True)
+    out = q("-p", "/hidden-bookmarks").stdout.splitlines()
+    hidden = [l.strip() for l in out if "://" in l]
+    for u in ("computer:///", "network:///", uri(xdg("DESKTOP", "Desktop"))):
+        if u not in hidden:
+            hidden.append(u)
+    args = []
+    for u in hidden:
+        args += ["-t", "string", "-s", u]
+    q("-p", "/hidden-bookmarks", "-n", "-a", *args)
+    q("-p", "/misc-thumbnail-mode", "-n", "-t", "string", "-s", "THUNAR_THUMBNAIL_MODE_ALWAYS")
+
+# ---- right-click "Open in Yazi" ----------------------------------------------
+uca = os.path.join(CONF, "Thunar", "uca.xml")
+action = """<action>
+	<icon>system-file-manager</icon>
+	<name>Open in Yazi</name>
+	<submenu></submenu>
+	<unique-id>rice-open-in-yazi</unique-id>
+	<command>kitty --class yazi -e yazi %f</command>
+	<description>Browse this folder with Yazi</description>
+	<range></range>
+	<patterns>*</patterns>
+	<startup-notify/>
+	<directories/>
+</action>
+"""
+try:
+    text = open(uca).read()
+except OSError:
+    text = '<?xml version="1.0" encoding="UTF-8"?>\n<actions>\n</actions>\n'
+if "rice-open-in-yazi" not in text and "</actions>" in text:
+    os.makedirs(os.path.dirname(uca), exist_ok=True)
+    with open(uca, "w") as f:
+        f.write(text.replace("</actions>", action + "</actions>", 1))

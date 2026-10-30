@@ -1,0 +1,11 @@
+# Yazi: the keyboard file manager (SUPER + Y, or `y` in a terminal).
+# Its colours are kitty's 16, which the rice themes, so Yazi follows the
+# wallpaper like everything else - no theme.toml needed.
+# Defaults and every option: https://github.com/sxyazi/yazi/tree/main/yazi-config/preset
+
+[mgr]
+ratio          = [ 1, 3, 4 ]     # parent · current · preview: more room for previews
+sort_by        = "natural"       # file2 before file10
+sort_dir_first = true
+linemode       = "size"
+show_hidden    = false           # "." toggles

@@ -16,6 +16,16 @@ function fish_greeting
     ~/.local/bin/arcade-fetch
 end
 
+# `y`: Yazi, and when you quit it the terminal is left in the folder you were in.
+function y
+    set tmp (mktemp -t "yazi-cwd.XXXXXX")
+    yazi $argv --cwd-file="$tmp"
+    if read -z cwd < "$tmp"; and [ -n "$cwd" ]; and [ "$cwd" != "$PWD" ]
+        builtin cd -- "$cwd"
+    end
+    rm -f -- "$tmp"
+end
+
 # `fetch` prints it again (handy after resizing the window).
 function fetch
     ~/.local/bin/arcade-fetch
