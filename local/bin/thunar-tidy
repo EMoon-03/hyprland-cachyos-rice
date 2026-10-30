@@ -2,7 +2,9 @@
 """Keeps Thunar the way this rice wants it. Safe to run any time; Hyprland runs
 it at every login (conf.d/50-eddie.lua), so a fresh install comes out the same.
 
-  sidebar     Downloads, Documents, Pictures (+ Music, Videos if they exist);
+  folders     Music and Videos created and registered as your XDG folders
+              (apps save there), if they're missing
+  sidebar     Downloads, Documents, Pictures, Music, Videos;
               no duplicate home entry; Computer, Desktop and Browse Network
               hidden (anything else you hide with right-click stays hidden)
   thumbnails  for every file, not just local ones
@@ -30,6 +32,15 @@ def xdg(name, fallback):
         p = ""
     return os.path.normpath(p or os.path.join(HOME, fallback))
 
+
+# ---- Music and Videos folders ------------------------------------------------
+# An XDG folder you don't have points at home; give Music and Videos real ones.
+if shutil.which("xdg-user-dirs-update"):
+    for name, folder in (("MUSIC", "Music"), ("VIDEOS", "Videos")):
+        if xdg(name, folder) == HOME:
+            path = os.path.join(HOME, folder)
+            os.makedirs(path, exist_ok=True)
+            subprocess.run(["xdg-user-dirs-update", "--set", name, path], capture_output=True)
 
 # ---- sidebar bookmarks -------------------------------------------------------
 bm_file = os.path.join(CONF, "gtk-3.0", "bookmarks")

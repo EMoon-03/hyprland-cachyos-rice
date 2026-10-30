@@ -5,5 +5,7 @@ prepend_keymap = [
 	{ on = "T",          run = "shell --orphan -- thunar .", desc = "Open this folder in Thunar" },
 	{ on = [ "g", "D" ], run = "cd ~/Documents",             desc = "Go to ~/Documents" },
 	{ on = [ "g", "p" ], run = "cd ~/Pictures",              desc = "Go to ~/Pictures" },
+	{ on = [ "g", "m" ], run = "cd ~/Music",                 desc = "Go to ~/Music" },
+	{ on = [ "g", "v" ], run = "cd ~/Videos",                desc = "Go to ~/Videos" },
 	{ on = [ "g", "u" ], run = "cd /run/media",              desc = "Go to USB drives" },
 ]
