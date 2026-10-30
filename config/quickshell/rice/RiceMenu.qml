@@ -93,6 +93,52 @@ Scope {
         .filter(r => r.n > 0)
         .map(r => Object.assign(r, { hint: r.n + (r.n === 1 ? " app" : " apps") }))
 
+    // Favourites (Eddie): pinned apps sit at the top of Apps, above the sections.
+    // Ctrl+P or right-click pins / unpins the app under the cursor. Saved as a
+    // list of .desktop ids in ~/.config/rice/favorites.json; the starting set is
+    // whichever of these are installed.
+    readonly property string favFile: home + "/.config/rice/favorites.json"
+    property var favIds: ["vivaldi-stable", "vivaldi", "kitty", "thunar", "steam", "discord",
+                          "youtube-music", "pear-desktop", "code-oss"]
+    readonly property var favApps: favIds
+        .map(id => apps.find(a => a.app.id === id))
+        .filter(a => a)
+        .map(a => Object.assign({}, a, { id: "fav:" + a.app.id }))
+
+    function isFav(e) {
+        return !!e && !!e.app && favIds.indexOf(e.app.id) >= 0
+    }
+
+    function toggleFav(e) {
+        if (!e || !e.app)
+            return
+        const id = e.app.id
+        const next = isFav(e) ? favIds.filter(x => x !== id) : favIds.concat([id])
+        favIds = next
+        favWrite.command = ["sh", "-c", 'mkdir -p "$(dirname "$1")" && printf "%s\\n" "$2" > "$1"',
+                            "sh", favFile, JSON.stringify(next)]
+        favWrite.running = true
+        sel = Math.max(0, Math.min(sel, rows.length - 1))
+    }
+
+    Process { id: favWrite }
+
+    FileView {
+        path: root.favFile
+        watchChanges: true
+        printErrors: false
+        onFileChanged: reload()
+        onLoaded: {
+            try {
+                const list = JSON.parse(text())
+                if (Array.isArray(list))
+                    root.favIds = list
+            } catch (err) {
+                console.warn("favorites.json: " + err)
+            }
+        }
+    }
+
     // Named themes (rice-theme list --json), re-read on every open.
     property var themeList: []
     readonly property var themes: themeList.map(t => ({
@@ -139,7 +185,7 @@ Scope {
     function childrenOf(id) {
         const e = find(id)
         if (e && e.source === "apps")
-            return appSectionRows
+            return favApps.concat(appSectionRows)
         if (e && e.source === "appsection")
             return apps.filter(a => a.section === e.section)
         return items.filter(c => c.parent === id && shown(c))
@@ -516,6 +562,9 @@ Scope {
                                 if (text) root.query = ""
                                 else root.back()
                                 break
+                            case Qt.Key_P:                                  // Ctrl+P: pin / unpin an app
+                                if (!(event.modifiers & Qt.ControlModifier) || !cur || !cur.app) return
+                                root.toggleFav(cur); break
                             default:
                                 return
                             }
@@ -594,7 +643,7 @@ Scope {
                                 icon: row.modelData.icon || ""
                                 appIcon: row.modelData.appIcon || ""
                                 swatch: row.modelData.swatch || ""
-                                size: 16
+                                size: row.modelData.appIcon ? 18 : 16
                                 color: row.asking ? Theme.error : Theme.on_surface
                             }
 
@@ -619,6 +668,13 @@ Scope {
                                 font.pixelSize: 11
                             }
 
+                            LucideIcon {
+                                visible: root.isFav(row.modelData)
+                                icon: "star"
+                                size: 13
+                                color: Theme.primary
+                            }
+
                             Text {
                                 visible: row.value !== undefined && row.value !== ""
                                 text: row.value || ""
@@ -640,8 +696,10 @@ Scope {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
+                            acceptedButtons: Qt.LeftButton | Qt.RightButton
                             onPositionChanged: root.sel = row.index    // not onEntered: rows slide under a still cursor
-                            onClicked: root.activate(row.modelData)
+                            onClicked: mouse => mouse.button === Qt.RightButton
+                                ? root.toggleFav(row.modelData) : root.activate(row.modelData)
                         }
                     }
                 }
