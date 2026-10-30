@@ -104,6 +104,8 @@
   { "id": "settings.system", "icon": "monitor", "label": "System" },
   { "id": "settings.system.cc", "icon": "󰙵", "label": "Control centre", "hint": "network, sound, theme, night light",
     "action": "controlcenter" },
+  { "id": "settings.system.side", "icon": "󰍹", "label": "Side monitor: portrait / landscape",
+    "hint": "after turning it · Super+Shift+O", "run": ["~/.local/bin/side-monitor", "toggle"] },
   { "id": "settings.system.sound", "icon": "󰕾", "label": "Sound", "hint": "outputs, inputs, per-app volume",
     "run": ["pavucontrol"] },
   { "id": "settings.system.network", "icon": "󰈀", "label": "Network connections", "hint": "wired, VPN, advanced",

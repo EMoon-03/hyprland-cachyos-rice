@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# The side monitor (HDMI-A-1, left of the main one) stands upright or lies flat.
+# Turn it physically, then tell Hyprland:
+#
+#   side-monitor portrait     rotated, 1080x1920 (the default)
+#   side-monitor landscape    normal, 1920x1080
+#   side-monitor toggle       the other one        (SUPER + SHIFT + O)
+#   side-monitor status       which one is on
+#
+# Either way it sits centred against the main monitor's left edge, and
+# workspaces 6-10 stay on it. The choice is saved in
+# ~/.config/hypr/conf.d/40-side-monitor.lua, so it survives a reboot.
+set -euo pipefail
+
+OUT="${SIDE_OUTPUT:-HDMI-A-1}"
+MODE_STR="${SIDE_MODE:-1920x1080@144}"
+FILE="$HOME/.config/hypr/conf.d/40-side-monitor.lua"
+
+current() {
+    if [[ -f "$FILE" ]] && grep -q 'transform = 0' "$FILE"; then echo landscape; else echo portrait; fi
+}
+
+# Height of the main monitor in layout pixels (its resolution / its scale),
+# so the side one can be centred on it whatever the main scale is.
+main_height() {
+    hyprctl monitors -j 2>/dev/null | jq -r --arg out "$OUT" '
+        [ .[] | select(.name != $out) ] | max_by(.width * .height)
+        | if . == null then 1152 else (.height / .scale | round) end'
+}
+
+apply() {
+    local want="$1" h y x transform
+    h="$(main_height)"; [[ "$h" =~ ^[0-9]+$ ]] || h=1152
+    if [[ "$want" == portrait ]]; then
+        x=-1080; y=$(( (h - 1920) / 2 )); transform=1
+    else
+        x=-1920; y=$(( (h - 1080) / 2 )); transform=0
+    fi
+    mkdir -p "$(dirname "$FILE")"
+    cat > "$FILE" <<LUA
+-- Written by side-monitor ($want). Delete it to go back to hyprland.lua's line.
+hl.monitor({ output = "$OUT", mode = "$MODE_STR", position = "${x}x${y}", scale = 1, transform = $transform })
+LUA
+    hyprctl reload >/dev/null
+    "$HOME/.local/bin/rice-wallpaper" restore >/dev/null 2>&1 || true
+    notify-send -a side-monitor -i video-display "Side monitor" "Now ${want}" 2>/dev/null || true
+    echo "side monitor: $want"
+}
+
+case "${1:-status}" in
+    portrait|landscape) apply "$1" ;;
+    toggle)  [[ "$(current)" == portrait ]] && apply landscape || apply portrait ;;
+    status)  current ;;
+    *)       sed -n '2,12s/^# \{0,1\}//p' "$0"; exit 2 ;;
+esac

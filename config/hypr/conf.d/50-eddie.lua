@@ -57,3 +57,7 @@ hl.window_rule({
     size  = { 460, 140 },
     move  = at_cursor,
 })
+
+-- Side monitor ----------------------------------------------------------------
+--   SUPER + SHIFT + O    portrait <-> landscape, after you turn it (side-monitor)
+rice.bind("SUPER + SHIFT + O", dsp.exec_cmd("~/.local/bin/side-monitor toggle"))
