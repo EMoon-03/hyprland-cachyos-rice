@@ -24,7 +24,6 @@ Scope {
 
     // Remembered across restarts (Toggles.qml).
     property bool enabled: Toggles.get("visualiser", true)
-    onEnabledChanged: Toggles.set("visualiser", enabled)
 
     readonly property int bandHeight: 400      // logical px, up from the bottom edge
     readonly property int barWidth: 28
@@ -84,6 +83,7 @@ noise_reduction = 60
     }
 
     onEnabledChanged: {
+        Toggles.set("visualiser", enabled)
         if (enabled) {
             start()
         } else {
