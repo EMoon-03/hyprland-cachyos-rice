@@ -17,7 +17,9 @@ import Quickshell.Wayland
 Scope {
     id: root
 
-    property bool enabled: true
+    // Remembered across restarts (Toggles.qml).
+    property bool enabled: Toggles.get("lyrics", true)
+    onEnabledChanged: Toggles.set("lyrics", enabled)
 
     readonly property bool active: enabled && LyricsService.playing && LyricsService.hasLyrics
     readonly property int bandHeight: 200

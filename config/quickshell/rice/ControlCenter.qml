@@ -144,7 +144,15 @@ Scope {
         else
             Quickshell.execDetached(["hyprsunset", "-t", String(nightTemperature)])
         nightLight = !nightLight
+        Toggles.set("nightLight", nightLight)
         nightRecheck.restart()
+    }
+
+    // Night light is remembered (Toggles.qml): if it was on, turn it back on
+    // when the shell starts - unless it is already running.
+    Component.onCompleted: {
+        if (Toggles.get("nightLight", false))
+            Quickshell.execDetached(["sh", "-c", "pgrep -x hyprsunset >/dev/null || exec hyprsunset -t " + nightTemperature])
     }
 
     // ----------------------------------------------------------- keyboard --

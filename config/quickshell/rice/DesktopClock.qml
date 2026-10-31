@@ -11,7 +11,9 @@ import Quickshell.Wayland
 Scope {
     id: root
 
-    property bool enabled: true
+    // Remembered across restarts (Toggles.qml).
+    property bool enabled: Toggles.get("clock", true)
+    onEnabledChanged: Toggles.set("clock", enabled)
 
     readonly property bool use24h: false       // the bar shows 12-hour, so this does too
     readonly property real topFraction: 0.12   // band top, as a share of screen height

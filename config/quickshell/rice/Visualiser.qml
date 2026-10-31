@@ -22,7 +22,9 @@ import Quickshell.Wayland
 Scope {
     id: root
 
-    property bool enabled: true
+    // Remembered across restarts (Toggles.qml).
+    property bool enabled: Toggles.get("visualiser", true)
+    onEnabledChanged: Toggles.set("visualiser", enabled)
 
     readonly property int bandHeight: 400      // logical px, up from the bottom edge
     readonly property int barWidth: 28
