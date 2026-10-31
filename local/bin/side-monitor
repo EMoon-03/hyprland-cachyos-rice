@@ -48,8 +48,6 @@ apply() {
 hl.monitor({ output = "$OUT", mode = "$MODE_STR", position = "${x}x${y}", scale = 1, transform = $transform })
 LUA
     hyprctl reload >/dev/null
-    # the reload re-creates XWayland's outputs: keep the main one primary for games
-    ( sleep 1; xrandr --output DP-2 --primary >/dev/null 2>&1 ) || true
     "$HOME/.local/bin/rice-wallpaper" restore >/dev/null 2>&1 || true
     notify-send -a side-monitor -i video-display "Side monitor" "Now ${want}" 2>/dev/null || true
     echo "side monitor: $want"
