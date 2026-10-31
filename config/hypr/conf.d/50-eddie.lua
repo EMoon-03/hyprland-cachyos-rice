@@ -97,6 +97,11 @@ hl.window_rule({
     idle_inhibit = "fullscreen",
 })
 
+-- No blank screen when anything goes fullscreen: don't tell the monitor "video
+-- is playing" (it switches picture mode, and blanks while it does) and don't
+-- auto-switch it to HDR.
+hl.config({ render = { send_content_type = false, cm_auto_hdr = 0 } })
+
 -- Side monitor ----------------------------------------------------------------
 --   SUPER + SHIFT + O    portrait <-> landscape, after you turn it (side-monitor)
 rice.bind("SUPER + SHIFT + O", dsp.exec_cmd("~/.local/bin/side-monitor toggle"))
