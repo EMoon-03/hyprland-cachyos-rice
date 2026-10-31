@@ -82,8 +82,13 @@ noise_reduction = 60
         cava.running = true
     }
 
+    // The saved value arrives while the component is still being built; only
+    // react to real switches after that (Component.onCompleted starts cava).
+    property bool ready: false
     onEnabledChanged: {
         Toggles.set("visualiser", enabled)
+        if (!ready)
+            return
         if (enabled) {
             start()
         } else {
@@ -93,7 +98,10 @@ noise_reduction = 60
         }
     }
     onCountChanged: if (cava.running) cava.running = false   // restarts with the new count
-    Component.onCompleted: start()
+    Component.onCompleted: {
+        ready = true
+        start()
+    }
 
     FileView {
         id: cavaConf
