@@ -138,7 +138,7 @@ if command -v pacman >/dev/null; then
           kitty grim slurp satty wl-clipboard cliphist brightnessctl playerctl wireplumber
           pavucontrol nm-connection-editor hyprsunset gpu-screen-recorder
           jq curl git imagemagick libnotify python python-numpy python-pillow
-          cava fastfetch btop thunar tumbler gvfs udiskie yazi github-cli
+          cava fastfetch btop thunar tumbler gvfs udiskie yazi xorg-xrandr github-cli
           adw-gtk-theme qt6ct papirus-icon-theme)
     mapfile -t missing < <(pacman -T "${pkgs[@]}" || true)
     command -v fc-list >/dev/null || missing+=(fontconfig)

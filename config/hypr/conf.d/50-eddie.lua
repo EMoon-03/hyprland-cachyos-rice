@@ -27,6 +27,9 @@ if not os.getenv("RICE_NO_AUTOSTART") then
     hl.on("hyprland.start", function()
         hl.exec_cmd("sh -c 'command -v udiskie >/dev/null && exec udiskie --no-tray --automount --notify'")
         hl.exec_cmd("~/.local/bin/thunar-tidy")   -- sidebar, thumbnails, "Open in Yazi" (safe to repeat)
+        -- Games (Proton/X11) ask XWayland for the "primary" monitor to pick their
+        -- resolution; unset, they took the side one and offered 1920x1080 at most.
+        hl.exec_cmd("sh -c 'for i in 1 2 3 4 5 6 7 8 9 10; do xrandr --output DP-2 --primary >/dev/null 2>&1 && exit 0; sleep 1; done'")
     end)
 end
 rice.bind("SUPER + SHIFT + E", dsp.exec_cmd(
