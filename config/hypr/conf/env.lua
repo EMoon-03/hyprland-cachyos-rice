@@ -15,3 +15,6 @@ hl.env("XCURSOR_SIZE", "24")
 hl.env("LIBVA_DRIVER_NAME", "nvidia")
 hl.env("NVD_BACKEND", "direct")
 hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
+-- Bigger shader cache (12 GB instead of NVIDIA's ~1 GB), so games don't
+-- recompile shaders - and stutter - every time the small cache fills up.
+hl.env("__GL_SHADER_DISK_CACHE_SIZE", "12000000000")
