@@ -94,8 +94,8 @@
     "value": "lyrics", "action": "lyrics.toggle" },
 
   { "id": "settings.bar", "icon": "app-window", "label": "Bar & shell" },
-  { "id": "settings.bar.toggle", "icon": "󰍜", "label": "Show / hide the bar",
-    "run": ["pkill", "-USR1", "-x", "waybar"] },
+  { "id": "settings.bar.toggle", "icon": "󰍜", "label": "Show / hide the bar", "hint": "remembered after a restart",
+    "run": ["sh", "-c", "f=\"$HOME/.local/state/rice/bar-hidden\"; if [ -f \"$f\" ]; then rm -f \"$f\"; else mkdir -p \"${f%/*}\" && : > \"$f\"; fi; pkill -USR1 -x waybar"] },
   { "id": "settings.bar.reload", "icon": "󰑓", "label": "Reload the bar", "hint": "re-read waybar's config and style",
     "run": ["pkill", "-USR2", "-x", "waybar"] },
   { "id": "settings.bar.quickshell", "icon": "󰑓", "label": "Reload Quickshell", "hint": "after editing its QML",

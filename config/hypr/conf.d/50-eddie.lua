@@ -27,6 +27,11 @@ if not os.getenv("RICE_NO_AUTOSTART") then
     hl.on("hyprland.start", function()
         hl.exec_cmd("sh -c 'command -v udiskie >/dev/null && exec udiskie --no-tray --automount --notify'")
         hl.exec_cmd("~/.local/bin/thunar-tidy")   -- sidebar, thumbnails, "Open in Yazi" (safe to repeat)
+        -- A bar hidden from the settings menu stays hidden after a restart: wait
+        -- for waybar to be up (SIGUSR1 before it is ready would kill it), then hide.
+        hl.exec_cmd("sh -c '[ -f \"$HOME/.local/state/rice/bar-hidden\" ] || exit 0; "
+            .. "for i in $(seq 40); do pgrep -x waybar >/dev/null && break; sleep 0.5; done; "
+            .. "sleep 2; pkill -USR1 -x waybar'")
     end)
 
     -- Games (Proton/X11) ask XWayland for the "primary" monitor to pick their
