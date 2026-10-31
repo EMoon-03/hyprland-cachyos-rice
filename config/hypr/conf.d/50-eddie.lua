@@ -85,6 +85,18 @@ hl.window_rule({
     monitor = "DP-2",
 })
 
+-- Fullscreen video in Vivaldi (YouTube, Twitch...) --------------------------
+-- The main monitor turns VRR on for anything fullscreen (vrr = 2). Switching it
+-- on makes the screen blank for a moment, and Vivaldi can drop out of
+-- fullscreen when that happens - so the browser never switches it. Games
+-- still get VRR. And the screens stay on while a video plays fullscreen.
+hl.window_rule({
+    name         = "vivaldi-fullscreen-video",
+    match        = { class = "(?i)^vivaldi.*$" },
+    no_vrr       = true,
+    idle_inhibit = "fullscreen",
+})
+
 -- Side monitor ----------------------------------------------------------------
 --   SUPER + SHIFT + O    portrait <-> landscape, after you turn it (side-monitor)
 rice.bind("SUPER + SHIFT + O", dsp.exec_cmd("~/.local/bin/side-monitor toggle"))
