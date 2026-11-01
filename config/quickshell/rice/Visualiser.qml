@@ -18,6 +18,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
+import Quickshell.Hyprland
 
 Scope {
     id: root
@@ -75,8 +76,26 @@ noise_reduction = 60
 `)
     }
 
+    // Paused while something fullscreen (a game, a video) covers the main
+    // monitor: nobody sees it then, and it would only take CPU and GPU time
+    // from the game. It comes back by itself when the fullscreen window leaves.
+    readonly property bool covered: {
+        const s = screensHere.length ? screensHere[0] : null
+        if (!s)
+            return false
+        const m = Hyprland.monitorFor(s)
+        return !!(m && m.activeWorkspace && m.activeWorkspace.hasFullscreen)
+    }
+    readonly property bool live: enabled && !covered
+
+    function stop() {
+        restart.stop()
+        cava.running = false
+        levels = []
+    }
+
     function start() {
-        if (!enabled || cava.running)
+        if (!live || cava.running)
             return
         writeConfig()
         cava.running = true
@@ -89,13 +108,18 @@ noise_reduction = 60
         Toggles.set("visualiser", enabled)
         if (!ready)
             return
-        if (enabled) {
+        if (enabled)
             start()
-        } else {
-            restart.stop()
-            cava.running = false
-            levels = []
-        }
+        else
+            stop()
+    }
+    onCoveredChanged: {
+        if (!ready)
+            return
+        if (covered)
+            stop()
+        else
+            start()
     }
     onCountChanged: if (cava.running) cava.running = false   // restarts with the new count
     Component.onCompleted: {
@@ -124,7 +148,7 @@ noise_reduction = 60
         }
         onExited: {
             root.levels = []
-            if (root.enabled)
+            if (root.live)
                 restart.start()                // cava died or the count changed
         }
     }
@@ -162,7 +186,7 @@ noise_reduction = 60
             required property var modelData
 
             screen: modelData
-            visible: root.enabled
+            visible: root.live
             anchors {
                 bottom: true
                 left: true

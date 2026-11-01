@@ -54,6 +54,7 @@ hl.window_rule({
     match = { class = [[^(steam_app_.*|cs2|.*\.exe|lutris|net\.lutris\.Lutris|moonlight|ryujinx)$]] },
     workspace = "1",
     fullscreen = true,
-    immediate = true,
+    -- No `immediate` (tearing): on NVIDIA it made frame pacing uneven - felt as
+    -- stutter. VRR (vrr = 2 on DP-2) keeps the input lag low anyway.
     idle_inhibit = "always",
 })

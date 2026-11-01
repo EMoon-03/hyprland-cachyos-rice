@@ -18,3 +18,5 @@ hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
 -- Bigger shader cache (12 GB instead of NVIDIA's ~1 GB), so games don't
 -- recompile shaders - and stutter - every time the small cache fills up.
 hl.env("__GL_SHADER_DISK_CACHE_SIZE", "12000000000")
+-- ...and never trim it: compiled shaders stay until you clear them yourself.
+hl.env("__GL_SHADER_DISK_CACHE_SKIP_CLEANUP", "1")

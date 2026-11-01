@@ -63,7 +63,7 @@ hl.config({
             inactive_border = c.divider,
         },
         layout = "dwindle",
-        allow_tearing = true,          -- games; paired with `immediate` in conf/rules.lua
+        allow_tearing = false,         -- no game asks for it (see conf/rules.lua)
         resize_on_border = true,
     },
 
