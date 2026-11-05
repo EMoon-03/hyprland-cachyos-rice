@@ -32,7 +32,7 @@ ShellRoot {
     Visualiser { id: visualiser }
     DesktopClock { id: clock }
     DesktopLyrics { id: lyrics }
-    Osd {}
+    Osd { id: osd }
     NotificationPopups {}
     NotificationCenter { id: notifs }
     Capture { id: capture }
@@ -56,6 +56,7 @@ ShellRoot {
         visualiser: visualiser
         clock: clock
         lyrics: lyrics
+        osd: osd
         binds: binds
         displays: displays
         controlCenter: cc

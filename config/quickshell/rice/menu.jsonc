@@ -92,6 +92,8 @@
     "value": "clock", "action": "clock.toggle" },
   { "id": "settings.rice.lyrics", "icon": "󰎈", "label": "Desktop lyrics", "keep": true,
     "value": "lyrics", "action": "lyrics.toggle" },
+  { "id": "settings.rice.osd", "icon": "󰕾", "label": "Volume & music pop-ups", "keep": true,
+    "hint": "the corner card when volume or the song changes", "value": "osd", "action": "osd.toggle" },
 
   { "id": "settings.bar", "icon": "app-window", "label": "Bar & shell" },
   { "id": "settings.bar.toggle", "icon": "󰍜", "label": "Show / hide the bar", "hint": "remembered after a restart",

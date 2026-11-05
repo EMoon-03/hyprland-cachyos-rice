@@ -30,6 +30,15 @@ Scope {
     property var targetScreen: null
     property string lastLayout: ""
 
+    // Volume, mic and music pop-ups: off unless switched on in the settings
+    // menu (Rice > Volume & music pop-ups). Remembered (Toggles.qml). The
+    // keyboard-layout card is unaffected.
+    property bool soundPopups: Toggles.get("soundPopups", false)
+    onSoundPopupsChanged: Toggles.set("soundPopups", soundPopups)
+    function toggle() {
+        soundPopups = !soundPopups
+    }
+
     readonly property bool showBar: kind === "volume" || kind === "mic"
     readonly property string icon: {
         switch (kind) {
@@ -66,6 +75,8 @@ Scope {
 
     function show(k, t, v, m, sub) {
         if (!armed)
+            return
+        if (k !== "keyboard" && !soundPopups)
             return
         kind = k
         title = t

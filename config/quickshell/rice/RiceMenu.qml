@@ -29,6 +29,7 @@ Scope {
     property var visualiser: null
     property var clock: null
     property var lyrics: null
+    property var osd: null
     property var controlCenter: null
     property var notifications: null
     property var dashboard: null
@@ -329,6 +330,7 @@ Scope {
         case "visualiser": return visualiser && visualiser.enabled ? "On" : "Off"
         case "clock":      return clock && clock.enabled ? "On" : "Off"
         case "lyrics":     return lyrics && lyrics.enabled ? "On" : "Off"
+        case "osd":        return osd && osd.soundPopups ? "On" : "Off"
         case "mode":       return mode === "light" ? "Light" : "Dark"
         case "theme":      return (themeList.find(t => t.current) || { name: "" }).name
         case "recording":  return capture && capture.recording ? capture.elapsedText : ""
@@ -355,6 +357,7 @@ Scope {
         case "visualiser.toggle": return visualiser.toggle()
         case "clock.toggle":      return clock.toggle()
         case "lyrics.toggle":     return lyrics.toggle()
+        case "osd.toggle":        return osd.toggle()
         case "shell.reload":      return Quickshell.reload(true)
         case "mode.toggle":
             mode = mode === "dark" ? "light" : "dark"     // the file confirms it

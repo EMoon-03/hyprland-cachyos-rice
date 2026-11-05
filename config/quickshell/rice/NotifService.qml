@@ -54,9 +54,19 @@ Singleton {
             root.list = next.slice(0, root.maxHistory)
             n.closed.connect(() => root.forget(n))
             root.save()
-            if (!n.lastGeneration && (!root.dnd || entry.critical))
+            if (!n.lastGeneration && (!root.dnd || entry.critical) && !root.isQuiet(entry))
                 root.popup(entry)
         }
+    }
+
+    // Music players announce every song with a notification. Those stay in the
+    // notification centre but never pop up (the song is on the bar anyway).
+    readonly property var quietApps: ["youtube music", "youtube-music", "pear desktop", "pear-desktop", "spotify"]
+    function isQuiet(entry) {
+        if (entry.critical)
+            return false
+        const app = (entry.app || "").toLowerCase()
+        return app === "music" || quietApps.some(q => app.indexOf(q) >= 0)
     }
 
     function entryFor(n) {
