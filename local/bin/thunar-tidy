@@ -111,3 +111,14 @@ if added:
     os.makedirs(os.path.dirname(uca), exist_ok=True)
     with open(uca, "w") as f:
         f.write(text)
+
+# 5. Folders open in Thunar. Yazi and kitty both claim inode/directory in their
+#    .desktop files, so "Browse local files" in Steam, "show in folder" in a
+#    browser and the like could open a terminal instead.
+try:
+    cur = subprocess.run(["xdg-mime", "query", "default", "inode/directory"],
+                         capture_output=True, text=True).stdout.strip()
+    if cur != "thunar.desktop":
+        subprocess.run(["xdg-mime", "default", "thunar.desktop", "inode/directory"], capture_output=True)
+except OSError:
+    pass
