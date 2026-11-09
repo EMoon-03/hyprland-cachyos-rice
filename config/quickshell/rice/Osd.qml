@@ -134,17 +134,33 @@ Scope {
     Instantiator {
         model: Mpris.players
 
-        delegate: Connections {
+        delegate: Item {
+            id: watcher
             required property var modelData
-            target: modelData
+            property bool shownPlaying: false      // set once below, not a binding
+            Component.onCompleted: shownPlaying = modelData.isPlaying
 
             function report() {
+                shownPlaying = modelData.isPlaying
                 if (modelData.trackTitle)
                     root.show("media", modelData.trackTitle, 0, !modelData.isPlaying,
                               modelData.trackArtist || modelData.identity)
             }
-            function onIsPlayingChanged() { report() }
-            function onTrackTitleChanged() { report() }
+
+            // Seeking in a video pauses and resumes playback for a moment.
+            // Only a pause or play that is still in effect after a short wait
+            // is reported, so scrubbing through a video shows nothing.
+            Timer {
+                id: settle
+                interval: 900
+                onTriggered: if (watcher.modelData.isPlaying !== watcher.shownPlaying) watcher.report()
+            }
+
+            Connections {
+                target: watcher.modelData
+                function onIsPlayingChanged() { settle.restart() }
+                function onTrackTitleChanged() { settle.stop(); watcher.report() }
+            }
         }
     }
 
