@@ -122,3 +122,18 @@ hl.config({ render = { send_content_type = false, cm_auto_hdr = 0 } })
 -- Side monitor ----------------------------------------------------------------
 --   SUPER + SHIFT + O    portrait <-> landscape, after you turn it (side-monitor)
 rice.bind("SUPER + SHIFT + O", dsp.exec_cmd("~/.local/bin/side-monitor toggle"))
+
+-- Ubisoft games ----------------------------------------------------------------
+-- Ubisoft Connect leaves a small, untitled floating window behind (a white bar
+-- in the top-left) that can also keep the mouse locked to the main monitor.
+-- It's moved to a hidden workspace instead. The game window itself has a
+-- title, so it isn't affected. Add more Ubisoft games' Steam IDs to the class.
+--   see it anyway:  hyprctl dispatch 'hl.dsp.workspace.toggle_special("ubisoft")'
+--   quit it all:    the X next to "Resume" in Steam
+--   911400 = Assassin's Creed III Remastered
+hl.window_rule({
+    name      = "ubisoft-leftover-hidden",
+    match     = { class = "^steam_app_(911400)$", title = "^$", float = true },
+    workspace = "special:ubisoft silent",
+    no_focus  = true,
+})
