@@ -59,16 +59,17 @@ else.
 
 ## Roman greeting (this fork)
 
-Every new terminal opens on a small marble Roman bust with a gold laurel wreath,
-beside the system info numbered I to IX, on a dark blue background.
+Every new terminal opens on a small Roman statue face beside the system info
+numbered I to IX, on a dark blue background.
 
 | | |
 |---|---|
-| greeting | `fastfetch` (from `fish_greeting` in `config/fish/config.fish`; `fetch` prints it again) |
+| greeting | `fish_greeting` in `config/fish/config.fish` (`fetch` prints it again) |
+| the picture | `rice-statue` downloads one from wallhaven.cc, crops the face square and keeps it in `~/.local/share/rice/statue.png` |
+| another picture | `rice-statue next` (the next most-favourited), or `rice-statue <id>` for one you picked (`wallhaven.cc/w/<id>`) |
+| no picture / not kitty | the pixel-art bust, `config/fastfetch/roman-bust.ansi`; `rice-statue clear` goes back to it |
 | layout and colours | `config/matugen/templates/fastfetch.jsonc` |
-| the bust | `config/fastfetch/roman-bust.ansi` (24 x 13 half-block pixel art) |
 | background | `background` at the end of `config/kitty/kitty.conf` |
-| old greeting back | point `fish_greeting` at `~/.local/bin/rice-fetch.sh` |
 
 ## Requirements
 

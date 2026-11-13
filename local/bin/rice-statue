@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# The terminal greeting's picture: a Roman statue face from wallhaven.cc,
+# cropped to a square and shown small beside the system info (kitty only;
+# anywhere else the pixel-art bust is used).
+#
+#   rice-statue             the most-favourited SFW "roman statue" picture
+#   rice-statue next        the next one in that list (keep going until you like one)
+#   rice-statue <id>        a picture you picked: the id is the end of its link,
+#                           wallhaven.cc/w/<id> (find one with Super+Ctrl+W or the site)
+#   rice-statue clear       back to the pixel-art bust
+#
+# Saved as ~/.local/share/rice/statue.png (its wallhaven id next to it), so it's
+# downloaded once, not every time a terminal opens.
+set -euo pipefail
+
+DIR="${XDG_DATA_HOME:-$HOME/.local/share}/rice"
+OUT="$DIR/statue.png"
+ID_FILE="$DIR/statue.id"
+QUERY="roman statue"
+
+api() { curl -fsSL --max-time 20 "https://wallhaven.cc/api/v1/$1"; }
+
+# ids of SFW general pictures for the query, most favourited first
+ranked() {
+    local q
+    q="$(jq -rn --arg q "$QUERY" '$q | @uri')"
+    api "search?q=$q&categories=100&purity=100&sorting=favorites&order=desc" | jq -r '.data[].id'
+}
+
+tmp=""
+trap 'rm -f "$tmp"' EXIT
+
+fetch() {
+    local id="$1" url w h s x y
+    url="$(api "w/$id" | jq -r '.data.path // empty')"
+    [[ -n "$url" ]] || { echo "No wallhaven picture with id $id" >&2; exit 1; }
+    tmp="$(mktemp --suffix=".${url##*.}")"
+    curl -fsSL --max-time 60 -o "$tmp" "$url"
+
+    # Square crop: centred left-right; on a tall picture a bit above the middle,
+    # where a statue's face usually is.
+    read -r w h < <(magick identify -format '%w %h\n' "$tmp[0]")
+    s=$(( w < h ? w : h ))
+    x=$(( (w - s) / 2 ))
+    y=$(( (h - s) / 4 ))
+    mkdir -p "$DIR"
+    magick "$tmp[0]" -crop "${s}x${s}+${x}+${y}" +repage -resize 480x480 -strip "png:$OUT.new"
+    mv -f "$OUT.new" "$OUT"
+    printf '%s\n' "$id" > "$ID_FILE"
+    echo "Greeting picture: wallhaven.cc/w/$id (open a new terminal to see it)"
+}
+
+case "${1:-}" in
+    clear)
+        rm -f "$OUT" "$ID_FILE"
+        echo "Back to the pixel-art bust." ;;
+    next)
+        cur="$(cat "$ID_FILE" 2>/dev/null || true)"
+        mapfile -t ids < <(ranked)
+        ((${#ids[@]})) || { echo "wallhaven returned nothing - try again later" >&2; exit 1; }
+        pick="${ids[0]}"
+        for i in "${!ids[@]}"; do
+            if [[ "${ids[$i]}" == "$cur" ]]; then
+                pick="${ids[$(( (i + 1) % ${#ids[@]} ))]}"
+                break
+            fi
+        done
+        fetch "$pick" ;;
+    "")
+        mapfile -t ids < <(ranked)
+        ((${#ids[@]})) || { echo "wallhaven returned nothing - try again later" >&2; exit 1; }
+        fetch "${ids[0]}" ;;
+    -h|--help)
+        sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//' ;;
+    *)
+        [[ "$1" =~ ^[a-z0-9]{6,8}$ ]] || { echo "Not a wallhaven id: $1 (it's the end of wallhaven.cc/w/<id>)" >&2; exit 1; }
+        fetch "$1" ;;
+esac

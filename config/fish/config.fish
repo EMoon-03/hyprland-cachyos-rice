@@ -8,11 +8,18 @@ end
 #    # smth smth
 #end
 
-# Greeting: fastfetch with a small marble Roman bust
+# Greeting: fastfetch beside a small Roman statue face from wallhaven
+# (~/.local/share/rice/statue.png, set with `rice-statue`; kitty only). Without
+# the picture, or outside kitty, it shows the pixel-art bust instead
 # (~/.config/matugen/templates/fastfetch.jsonc).
-# The old picture/GIF greeting is still there: ~/.local/bin/rice-fetch.sh
 function fish_greeting
-    fastfetch
+    set -l pic ~/.local/share/rice/statue.png
+    if test "$TERM" = xterm-kitty; and test -f $pic
+        fastfetch --logo-type kitty-direct --logo $pic --logo-width 20 --logo-height 10 \
+            --logo-padding-top 1 --logo-padding-left 2 --logo-padding-right 3
+    else
+        fastfetch
+    end
 end
 
 # `y`: Yazi, and when you quit it the terminal is left in the folder you were in.
@@ -27,5 +34,5 @@ end
 
 # `fetch` prints it again (handy after resizing the window).
 function fetch
-    fastfetch
+    fish_greeting
 end
