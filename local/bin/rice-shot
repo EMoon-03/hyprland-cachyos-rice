@@ -49,11 +49,11 @@ fail() {
 }
 
 # slurp's own colours are a faint white tint and a black border, which on a dark
-# screen looks like nothing happened. Dim the screen instead and draw the
+# screen looks like nothing happened. Dim the screen (about 2/3 black) and draw the
 # selection in the theme colour (from matugen), 2 px.
 accent="$(jq -r '.primary // empty' "$HOME/.cache/rice/quickshell-colors.json" 2>/dev/null)"
 [[ "$accent" =~ ^#[0-9a-fA-F]{6}$ ]] || accent="#89b4fa"
-slurp_look=(-d -w 2 -b "#00000073" -c "${accent}ff" -s "#00000000")
+slurp_look=(-d -w 2 -b "#000000aa" -c "${accent}ff" -s "#00000000")
 
 case "$mode" in
     finish)

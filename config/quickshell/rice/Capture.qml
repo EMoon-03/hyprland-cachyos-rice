@@ -193,7 +193,7 @@ Scope {
     Process {
         id: slurp
         command: ["slurp", "-d", "-w", "2",
-            "-b", "#00000073",
+            "-b", "#000000aa",
             "-c", String(Theme.primary).slice(0, 7) + "ff",
             "-s", "#00000000",
             "-f", "%x %y %w %h"]
