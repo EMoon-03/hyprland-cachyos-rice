@@ -86,6 +86,7 @@ Scope {
     }
 
     function shoot(grimArgs) {
+        console.info("capture: grim", JSON.stringify(grimArgs))
         if (shooter.running)
             return
         shooter.file = shotDir + "/Screenshot_" + stamp() + ".png"
@@ -201,8 +202,10 @@ Scope {
     // slurp draws the selection (drag; Esc or a click without dragging cancels).
     // It replaced a home-made overlay whose selection could vanish mid-drag.
     function pick(callback) {
-        if (picking)
+        if (picking) {
+            console.warn("capture: area picker already open - ignored")
             return
+        }
         pickCallback = callback
         later(() => {
             root.picking = true
@@ -228,8 +231,13 @@ Scope {
         stdout: StdioCollector {
             id: slurpOut
         }
+        stderr: StdioCollector {
+            id: slurpErr
+        }
+        onStarted: console.info("capture: area picker (slurp) started")
         onExited: code => {
             const v = slurpOut.text.trim().split(/\s+/).map(Number)
+            console.info("capture: slurp exited", code, JSON.stringify(slurpOut.text.trim()), slurpErr.text.trim())
             if (code !== 0 || v.length !== 4 || v.some(isNaN) || v[2] < 4 || v[3] < 4) {
                 root.finishPick(null)
                 return
