@@ -64,13 +64,6 @@ for name, fallback in [("DOWNLOAD", "Downloads"), ("DOCUMENTS", "Documents"), ("
     if p != HOME and os.path.isdir(p) and uri(p) not in seen:
         seen.add(uri(p))
         kept.append(uri(p))
-# where the screenshot and recording tools save (created so they're there from the start)
-for sub in ("Pictures/Screenshots", "Videos/Recordings"):
-    p = os.path.join(HOME, sub)
-    os.makedirs(p, exist_ok=True)
-    if uri(p) not in seen:
-        seen.add(uri(p))
-        kept.append(uri(p))
 if kept != lines:
     with open(bm_file, "w") as f:
         f.write("\n".join(kept) + "\n")

@@ -160,8 +160,8 @@ is no longer read: make them again, and they are saved as `conf.d/*.lua`.
 | `Super+/` | keybind cheatsheet and rebinding |
 | `Super+Shift+W` / `Super+Alt+W` / `Super+Ctrl+W` | themes & wallpapers / next wallpaper in the theme / search wallhaven |
 | `Super+Shift+S` | screenshot and record menu |
-| `Print` / `Shift+Print` / `Alt+Print` | screenshot of an area / this monitor / this window: saved to `~/Pictures/Screenshots`, copied, and a notification with Open / Edit / Show in folder |
-| `Ctrl+Print` | area, then opened in satty to draw on (saved beside it as `..._edited.png`) |
+| `Print` / `Shift+Print` | area / whole screen to the clipboard |
+| `Super+Print` / `Ctrl+Print` | area to `~/Pictures` / area into satty |
 | `F8` | save the replay buffer (needs `gsr-replay-start` running) |
 | `Super+V` | clipboard history |
 | `Super+C` / `Super+Shift+C` | chess.com (floating, workspace 1) / GNOME Chess against the bot |
