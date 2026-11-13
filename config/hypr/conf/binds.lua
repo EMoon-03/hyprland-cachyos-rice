@@ -37,7 +37,7 @@ bind("SUPER + SHIFT + W",      exec("qs -c rice ipc call themes toggle"))       
 bind("SUPER + slash",          exec("qs -c rice ipc call binds toggle"))           -- cheatsheet + rebinding
 bind("SUPER + comma",          exec("qs -c rice ipc call settings toggle"))        -- settings hub
 bind("SUPER + D",              exec("qs -c rice ipc call dashboard toggle"))       -- dashboard
-bind("SUPER + SHIFT + S",      exec("qs -c rice ipc call capture menu"))           -- screenshot / record
+bind("SUPER + SHIFT + S",      exec("qs -c rice ipc call capture menu"))           -- screenshots
 bind("SUPER + ALT + W",        exec(bin .. "/rice-wallpaper next"))     -- next wallpaper in the theme
 bind("SUPER + CTRL + W",       exec(bin .. "/rice-wallhaven"))
 bind("SUPER + SHIFT + D",      exec(bin .. "/rice-settings displays"))
@@ -50,7 +50,6 @@ bind("Print",                  exec([[grim -g "$(slurp)" - | wl-copy -t image/pn
 bind("SHIFT + Print",          exec([[grim - | wl-copy -t image/png]]))
 bind("SUPER + Print",          exec([[grim -g "$(slurp)" ~/Pictures/shot-$(date +%s).png]]))
 bind("CTRL + Print",           exec([[grim -g "$(slurp)" - | satty -f -]]))
-bind("F8",                     exec(bin .. "/gsr-replay-save"))         -- save the last 3 min of the replay buffer
 
 -- ---------------------------------------------------- reading back / focus --
 bind("SUPER + F",              exec(bin .. "/hypr-focus.sh"))

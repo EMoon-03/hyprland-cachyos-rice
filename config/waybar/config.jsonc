@@ -3,7 +3,7 @@
 //
 //   left    launcher + clipboard · workspaces · cpu gpu ram
 //   centre  clock · music (opens the dashboard's Media tab)
-//   right   screenshot + record · notifications · network volume mic · tray
+//   right   screenshot · notifications · network volume mic · tray
 //
 // Power and settings live in the control centre's header now.
 {
@@ -21,7 +21,7 @@
   // ---------------------------------------------------------------- groups --
   "group/launch":  { "orientation": "horizontal", "modules": ["custom/launcher", "custom/clipboard"] },
   "group/hw":      { "orientation": "horizontal", "modules": ["cpu", "custom/gpu", "memory"] },
-  "group/capture": { "orientation": "horizontal", "modules": ["custom/screenshot", "custom/record"] },
+  "group/capture": { "orientation": "horizontal", "modules": ["custom/screenshot"] },
   "group/tools":   { "orientation": "horizontal", "modules": ["custom/notifications"] },
   "group/sys":     { "orientation": "horizontal", "modules": ["network", "pulseaudio", "pulseaudio#mic"] },
   // A drawer: only the note shows; hovering it slides out the song's name.
@@ -98,20 +98,12 @@
   },
 
   // ----------------------------------------------------------------- right --
-  // Screenshot: click = the capture menu, right-click = region into satty.
+  // Screenshot: click = the capture menu, right-click = an area straight away.
   "custom/screenshot": {
     "format": "󰹑",
     "tooltip-format": "Screenshot",
     "on-click": "qs -c rice ipc call capture menu",
-    "on-click-right": "grim -g \"$(slurp)\" - | satty -f -"
-  },
-  // Record: click = record the screen / stop, right-click = record an area.
-  // While recording it becomes a red timer (scripts/recording.sh).
-  "custom/record": {
-    "exec": "~/.config/waybar/scripts/recording.sh",
-    "return-type": "json",
-    "on-click": "qs -c rice ipc call capture toggleRecording",
-    "on-click-right": "qs -c rice ipc call capture record area"
+    "on-click-right": "qs -c rice ipc call capture screenshot area"
   },
 
   // Bell: state from Quickshell's notification server (NotifService.qml),

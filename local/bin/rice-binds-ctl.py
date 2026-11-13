@@ -143,7 +143,7 @@ LABELS = [
     (r"ipc call binds", "Keybind menu"),
     (r"ipc call settings", "Settings menu"),
     (r"ipc call dashboard", "Dashboard"),
-    (r"ipc call capture menu", "Screenshot / record menu"),
+    (r"ipc call capture menu", "Screenshot menu"),
     (r"^exec rice-settings displays", "Display settings"),
     (r"^exec rice-settings look", "Look settings"),
     (r"^exec rice-settings colour", "Screen colour"),

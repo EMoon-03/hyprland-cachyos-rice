@@ -179,7 +179,7 @@ Scope {
     }
 
     function shown(e) {
-        return e.when !== "recording" || (capture && capture.recording)
+        return !e.when                       // no conditional entries left
     }
 
     function childrenOf(id) {
@@ -334,7 +334,6 @@ Scope {
         case "osdMusic":   return osd && osd.musicPopups ? "On" : "Off"
         case "mode":       return mode === "light" ? "Light" : "Dark"
         case "theme":      return (themeList.find(t => t.current) || { name: "" }).name
-        case "recording":  return capture && capture.recording ? capture.elapsedText : ""
         }
         return undefined
     }
@@ -347,9 +346,6 @@ Scope {
         case "capture.screen":    return capture.screenshot("screen")
         case "capture.window":    return capture.screenshot("window")
         case "capture.area":      return capture.screenshot("area")
-        case "record.screen":     return capture.record("screen")
-        case "record.area":       return capture.record("area")
-        case "record.stop":       return capture.stop()
         case "themes":            return themePicker.show("themes")
         case "displays":          return displays.show()
         case "keybinds":          return binds.show()

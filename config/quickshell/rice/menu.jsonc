@@ -11,11 +11,10 @@
 //   run      argv, started detached; a leading ~ is expanded
 //   sh       a shell command line, for pipes and $(...)
 //   action   something inside the shell - see RiceMenu.doAction()
-//   value    a live state pill: visualiser | clock | lyrics | power | mode | recording
+//   value    a live state pill: visualiser | clock | lyrics | power | mode
 //   keep     stay open after running (for switches that show their value)
 //   confirm  ask for a second Enter first
 //   requires a path that must exist, or the entry is hidden
-//   when     only show while: recording
 //   source   "apps" fills the submenu with every app rofi lists
 //   keywords extra words the search matches
 //
@@ -26,21 +25,13 @@
   { "id": "apps", "icon": "layout-grid", "label": "Apps", "hint": "by section · type to search all", "source": "apps" },
 
   // --------------------------------------------------------------- capture --
-  { "id": "capture", "icon": "camera", "label": "Capture", "hint": "screenshots, recording, replays" },
+  { "id": "capture", "icon": "camera", "label": "Capture", "hint": "screenshots" },
   { "id": "capture.screen", "icon": "monitor", "label": "Screenshot screen", "hint": "the focused monitor",
     "action": "capture.screen" },
   { "id": "capture.window", "icon": "app-window", "label": "Screenshot window", "hint": "the active window",
     "action": "capture.window" },
   { "id": "capture.area", "icon": "crop", "label": "Screenshot area", "hint": "drag a box",
     "action": "capture.area" },
-  { "id": "capture.record-screen", "icon": "video", "label": "Record screen", "hint": "the focused monitor",
-    "action": "record.screen", "keywords": "video" },
-  { "id": "capture.record-area", "icon": "square-dashed", "label": "Record area", "hint": "drag a box",
-    "action": "record.area", "keywords": "video" },
-  { "id": "capture.stop", "icon": "circle-stop", "label": "Stop recording", "value": "recording",
-    "action": "record.stop", "when": "recording" },
-  { "id": "capture.replay", "icon": "save", "label": "Save replay", "hint": "the last 3 minutes (F8)",
-    "run": ["~/.local/bin/gsr-replay-save"], "keywords": "clip gsr" },
   { "id": "capture.menu", "icon": "aperture", "label": "Capture panel", "hint": "Super+Shift+S",
     "action": "capture.menu" },
 
@@ -70,7 +61,7 @@
   { "id": "settings.rice", "icon": "palette", "label": "Rice" },
   { "id": "settings.rice.dashboard", "icon": "󰕮", "label": "Dashboard", "hint": "media, weather, system, tasks",
     "action": "dashboard" },
-  { "id": "settings.rice.capture", "icon": "󰄀", "label": "Screenshot & record", "hint": "screen, window or area",
+  { "id": "settings.rice.capture", "icon": "󰄀", "label": "Screenshots", "hint": "screen, window or area",
     "action": "capture.menu" },
   { "id": "settings.rice.look", "icon": "󰉼", "label": "Look", "hint": "gaps, borders, rounding, blur",
     "run": ["~/.local/bin/rice-settings", "look"] },

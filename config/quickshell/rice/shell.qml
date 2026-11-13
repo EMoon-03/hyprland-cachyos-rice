@@ -1,7 +1,7 @@
 // The rice's Quickshell layer.
 //
 //   qs -c rice ipc call dashboard toggle        dashboard (Super+D, bar clock)
-//   qs -c rice ipc call capture menu            screenshot / record (Super+Shift+S)
+//   qs -c rice ipc call capture menu            screenshots (Super+Shift+S)
 //   qs -c rice ipc call controlcenter toggle    control centre (network/volume pill)
 //   qs -c rice ipc call notifications toggle    notification centre (Super+N, bell)
 //   qs -c rice ipc call menu toggle             rice menu: apps, capture, style, settings, tools, system (Super+Space)
@@ -98,15 +98,8 @@ ShellRoot {
         function menu(): void { shell.closeOthers(captureMenu); captureMenu.toggle() }
         // screen | window | area
         function screenshot(mode: string): void { shell.closeOthers(null); capture.screenshot(mode) }
-        // the area picker's answer (Capture.qml runs slurp detached): "x y w h" or ""
-        function picked(geometry: string): void { capture.picked(geometry) }
         // a shot waiting for Save / Copy / Edit / Cancel (rice-shot ... ask)
         function review(path: string): void { shell.closeOthers(null); shotReview.review(path) }
-        // screen | area
-        function record(mode: string): void { shell.closeOthers(null); capture.record(mode) }
-        function stop(): void { capture.stop() }
-        function toggleRecording(): void { shell.closeOthers(null); capture.toggleRecording() }
-        function status(): string { return capture.recording ? "recording " + capture.elapsedText : "idle" }
     }
 
     IpcHandler {

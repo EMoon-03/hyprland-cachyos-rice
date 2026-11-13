@@ -10,7 +10,7 @@ sudo pacman -S --needed \
   hyprland hypridle hyprlock hyprpolkitagent xdg-desktop-portal-hyprland \
   waybar rofi awww matugen quickshell \
   kitty grim slurp satty wl-clipboard cliphist brightnessctl playerctl wireplumber \
-  pavucontrol nm-connection-editor hyprsunset gpu-screen-recorder \
+  pavucontrol nm-connection-editor hyprsunset \
   jq curl git imagemagick libnotify python python-numpy python-pillow \
   cava fastfetch btop thunar tumbler gvfs udiskie yazi xorg-xrandr github-cli \
   adw-gtk-theme qt6ct nwg-look papirus-icon-theme ttf-jetbrains-mono-nerd inter-font
@@ -32,7 +32,7 @@ Plus `bibata-cursor-theme-bin` from the AUR, or change `XCURSOR_THEME` in
 | `git` | `rice-theme import-omarchy` |
 | `hypridle`, `hyprlock` | idle; lock-screen fallback and its PAM config |
 | `hyprpolkitagent` | password prompts |
-| `grim`, `slurp`, `satty`, `gpu-screen-recorder` | screenshots, annotation, recording, replay buffer |
+| `grim`, `slurp`, `satty` | screenshots and drawing on them |
 | `wl-clipboard`, `cliphist` | clipboard history |
 | `wireplumber`, `playerctl`, `brightnessctl` | media keys and the OSD |
 | `hyprsunset` | Night Light |
