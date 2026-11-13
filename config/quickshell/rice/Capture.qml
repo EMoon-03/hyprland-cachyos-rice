@@ -169,7 +169,9 @@ Scope {
 
     // --------------------------------------------------------- area picker --
     // slurp draws the selection (drag; Esc or a click without dragging cancels).
-    // It replaced a home-made overlay whose selection could vanish mid-drag.
+    // It runs detached, the way rice-shot runs it: started as a child Process
+    // of the shell it stayed invisible. It hands the area back through
+    // `qs ipc call capture picked "<x> <y> <w> <h>"` (empty = cancelled).
     function pick(callback) {
         if (picking) {
             console.warn("capture: area picker already open - ignored")
@@ -178,8 +180,24 @@ Scope {
         pickCallback = callback
         later(() => {
             root.picking = true
-            slurp.running = true
+            console.info("capture: area picker (slurp) started")
+            Quickshell.execDetached(["bash", "-c",
+                'g="$(slurp -d -w 2 -b "#000000aa" -c "$1" -s "#00000000" -f "%x %y %w %h")"; '
+                + 'qs -c rice ipc call capture picked "$g"',
+                "_", String(Theme.primary).slice(0, 7) + "ff"])
         })
+    }
+
+    // slurp's answer, from the IPC call above
+    function picked(text) {
+        const v = String(text).trim().split(/\s+/).map(Number)
+        console.info("capture: area picked", JSON.stringify(String(text).trim()))
+        if (v.length !== 4 || v.some(isNaN) || v[2] < 4 || v[3] < 4) {
+            finishPick(null)
+            return
+        }
+        const [x, y, w, h] = v          // global logical coordinates, as grim -g expects
+        finishPick({ grim: `${x},${y} ${w}x${h}`, gsr: `${w}x${h}+${x}+${y}` })
     }
 
     function finishPick(geometry) {
@@ -188,31 +206,5 @@ Scope {
         pickCallback = null
         if (callback && geometry)
             later(() => callback(geometry))
-    }
-
-    Process {
-        id: slurp
-        command: ["slurp", "-d", "-w", "2",
-            "-b", "#000000aa",
-            "-c", String(Theme.primary).slice(0, 7) + "ff",
-            "-s", "#00000000",
-            "-f", "%x %y %w %h"]
-        stdout: StdioCollector {
-            id: slurpOut
-        }
-        stderr: StdioCollector {
-            id: slurpErr
-        }
-        onStarted: console.info("capture: area picker (slurp) started")
-        onExited: code => {
-            const v = slurpOut.text.trim().split(/\s+/).map(Number)
-            console.info("capture: slurp exited", code, JSON.stringify(slurpOut.text.trim()), slurpErr.text.trim())
-            if (code !== 0 || v.length !== 4 || v.some(isNaN) || v[2] < 4 || v[3] < 4) {
-                root.finishPick(null)
-                return
-            }
-            const [x, y, w, h] = v          // global logical coordinates, as grim -g expects
-            root.finishPick({ grim: `${x},${y} ${w}x${h}`, gsr: `${w}x${h}+${x}+${y}` })
-        }
     }
 }

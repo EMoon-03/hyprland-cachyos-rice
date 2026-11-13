@@ -98,6 +98,8 @@ ShellRoot {
         function menu(): void { shell.closeOthers(captureMenu); captureMenu.toggle() }
         // screen | window | area
         function screenshot(mode: string): void { shell.closeOthers(null); capture.screenshot(mode) }
+        // the area picker's answer (Capture.qml runs slurp detached): "x y w h" or ""
+        function picked(geometry: string): void { capture.picked(geometry) }
         // a shot waiting for Save / Copy / Edit / Cancel (rice-shot ... ask)
         function review(path: string): void { shell.closeOthers(null); shotReview.review(path) }
         // screen | area
