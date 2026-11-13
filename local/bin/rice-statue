@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 # The terminal greeting's picture: a Roman statue face from wallhaven.cc,
-# cropped to a square and shown small beside the system info (kitty only;
-# anywhere else the pixel-art bust is used).
+# cropped to a square and shown small beside the system info (kitty only).
 #
-#   rice-statue             the most-favourited SFW "roman statue" picture
+#   rice-statue             the most-favourited SFW Roman statue face / bust picture
 #   rice-statue next        the next one in that list (keep going until you like one)
 #   rice-statue <id>        a picture you picked: the id is the end of its link,
 #                           wallhaven.cc/w/<id> (find one with Super+Ctrl+W or the site)
-#   rice-statue clear       back to the pixel-art bust
+#   rice-statue clear       no picture (the greeting fetches the first one again)
 #
 # Saved as ~/.local/share/rice/statue.png (its wallhaven id next to it), so it's
 # downloaded once, not every time a terminal opens.
@@ -16,7 +15,7 @@ set -euo pipefail
 DIR="${XDG_DATA_HOME:-$HOME/.local/share}/rice"
 OUT="$DIR/statue.png"
 ID_FILE="$DIR/statue.id"
-QUERY="roman statue"
+QUERY="roman statue face"
 
 api() { curl -fsSL --max-time 20 "https://wallhaven.cc/api/v1/$1"; }
 
@@ -53,7 +52,7 @@ fetch() {
 case "${1:-}" in
     clear)
         rm -f "$OUT" "$ID_FILE"
-        echo "Back to the pixel-art bust." ;;
+        echo "Picture removed." ;;
     next)
         cur="$(cat "$ID_FILE" 2>/dev/null || true)"
         mapfile -t ids < <(ranked)

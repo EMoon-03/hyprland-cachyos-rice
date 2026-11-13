@@ -9,9 +9,9 @@ end
 #end
 
 # Greeting: fastfetch beside a small Roman statue face from wallhaven
-# (~/.local/share/rice/statue.png, set with `rice-statue`; kitty only). Without
-# the picture, or outside kitty, it shows the pixel-art bust instead
-# (~/.config/matugen/templates/fastfetch.jsonc).
+# (~/.local/share/rice/statue.png; `rice-statue next` for another one). Only in
+# kitty, which can show pictures. If there's no picture yet, it's fetched in the
+# background for the next terminal and this one shows just the info.
 function fish_greeting
     set -l pic ~/.local/share/rice/statue.png
     if test "$TERM" = xterm-kitty; and test -f $pic
@@ -19,6 +19,10 @@ function fish_greeting
             --logo-padding-top 1 --logo-padding-left 2 --logo-padding-right 3
     else
         fastfetch
+        if test "$TERM" = xterm-kitty; and not test -f $pic; and command -q rice-statue
+            rice-statue >/dev/null 2>&1 &
+            disown
+        end
     end
 end
 
