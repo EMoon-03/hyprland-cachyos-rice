@@ -1,21 +1,28 @@
 #!/usr/bin/env bash
-# The terminal greeting's picture: a Roman statue face from wallhaven.cc,
-# cropped to a square and shown small beside the system info (kitty only).
+# The terminal greeting's statue: Michelangelo's David from wallhaven.cc, cropped
+# square around the face and drawn as ASCII art beside the system info (any
+# terminal). In kitty it can show the photo itself instead.
 #
-#   rice-statue             the most-favourited SFW Roman statue face / bust picture
+#   rice-statue             the most-favourited SFW picture of David
 #   rice-statue next        the next one in that list (keep going until you like one)
 #   rice-statue <id>        a picture you picked: the id is the end of its link,
 #                           wallhaven.cc/w/<id> (find one with Super+Ctrl+W or the site)
-#   rice-statue clear       no picture (the greeting fetches the first one again)
+#   rice-statue ascii       show it as ASCII art (the default)
+#   rice-statue picture     show the photo instead (kitty only)
+#   rice-statue clear       remove it (the greeting fetches the first one again)
 #
-# Saved as ~/.local/share/rice/statue.png (its wallhaven id next to it), so it's
-# downloaded once, not every time a terminal opens.
+# Kept in ~/.local/share/rice/ (statue.png, statue.txt, its wallhaven id and the
+# mode), so it's downloaded once, not every time a terminal opens.
 set -euo pipefail
 
 DIR="${XDG_DATA_HOME:-$HOME/.local/share}/rice"
-OUT="$DIR/statue.png"
+PNG="$DIR/statue.png"
+TXT="$DIR/statue.txt"
 ID_FILE="$DIR/statue.id"
-QUERY="roman statue face"
+MODE_FILE="$DIR/statue.mode"
+QUERY="michelangelo david"
+COLS=34          # ASCII size in characters (terminal cells are about twice as
+ROWS=17          # tall as wide, so 34 x 17 is a square)
 
 api() { curl -fsSL --max-time 20 "https://wallhaven.cc/api/v1/$1"; }
 
@@ -24,6 +31,37 @@ ranked() {
     local q
     q="$(jq -rn --arg q "$QUERY" '$q | @uri')"
     api "search?q=$q&categories=100&purity=100&sorting=favorites&order=desc" | jq -r '.data[].id'
+}
+
+# statue.png -> statue.txt: brighter = denser character, each one tinted from
+# shadow blue-grey to marble white by its brightness.
+render_ascii() {
+    python3 -I - "$PNG" "$TXT" "$COLS" "$ROWS" <<'PY'
+import sys
+from PIL import Image, ImageOps, ImageFilter
+src, dst, cols, rows = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
+ramp = " .:-=+*#%@"
+dark, light = (70, 82, 110), (236, 230, 216)        # shadow, marble
+im = Image.open(src).convert("L")
+im = ImageOps.autocontrast(im, cutoff=2)
+im = im.filter(ImageFilter.UnsharpMask(radius=2, percent=140, threshold=2))
+im = im.resize((cols, rows), Image.LANCZOS)
+px = im.load()
+lines = []
+for y in range(rows):
+    out = []
+    for x in range(cols):
+        v = px[x, y]
+        ch = ramp[v * (len(ramp) - 1) // 255]
+        if ch == " ":
+            out.append(" ")
+            continue
+        t = v / 255
+        r, g, b = (round(d + (l - d) * t) for d, l in zip(dark, light))
+        out.append(f"\x1b[38;2;{r};{g};{b}m{ch}")
+    lines.append("".join(out) + "\x1b[0m")
+open(dst, "w").write("\n".join(lines) + "\n")
+PY
 }
 
 tmp=""
@@ -43,16 +81,23 @@ fetch() {
     x=$(( (w - s) / 2 ))
     y=$(( (h - s) / 4 ))
     mkdir -p "$DIR"
-    magick "$tmp[0]" -crop "${s}x${s}+${x}+${y}" +repage -resize 480x480 -strip "png:$OUT.new"
-    mv -f "$OUT.new" "$OUT"
+    magick "$tmp[0]" -crop "${s}x${s}+${x}+${y}" +repage -resize 480x480 -strip "png:$PNG.new"
+    mv -f "$PNG.new" "$PNG"
+    render_ascii
     printf '%s\n' "$id" > "$ID_FILE"
-    echo "Greeting picture: wallhaven.cc/w/$id (open a new terminal to see it)"
+    cat "$TXT"
+    echo "wallhaven.cc/w/$id - open a new terminal to see it there (rice-statue next for another)"
 }
 
 case "${1:-}" in
     clear)
-        rm -f "$OUT" "$ID_FILE"
-        echo "Picture removed." ;;
+        rm -f "$PNG" "$TXT" "$ID_FILE"
+        echo "Statue removed." ;;
+    ascii|picture)
+        mkdir -p "$DIR"
+        printf '%s\n' "$1" > "$MODE_FILE"
+        [[ "$1" == ascii && -f "$PNG" && ! -f "$TXT" ]] && render_ascii
+        echo "The greeting shows the statue as: $1" ;;
     next)
         cur="$(cat "$ID_FILE" 2>/dev/null || true)"
         mapfile -t ids < <(ranked)
@@ -70,7 +115,7 @@ case "${1:-}" in
         ((${#ids[@]})) || { echo "wallhaven returned nothing - try again later" >&2; exit 1; }
         fetch "${ids[0]}" ;;
     -h|--help)
-        sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//' ;;
+        sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//' ;;
     *)
         [[ "$1" =~ ^[a-z0-9]{6,8}$ ]] || { echo "Not a wallhaven id: $1 (it's the end of wallhaven.cc/w/<id>)" >&2; exit 1; }
         fetch "$1" ;;

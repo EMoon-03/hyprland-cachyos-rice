@@ -57,17 +57,18 @@ else.
 | palette | matugen | `config/matugen` |
 | idle, lock fallback | hypridle, hyprlock | `config/hypr` |
 
-## Roman greeting (this fork)
+## Statue greeting (this fork)
 
-Every new terminal opens on a small Roman statue face beside the system info
-numbered I to IX, on a dark blue background.
+Every new terminal opens on Michelangelo's David as ASCII art beside the system
+info numbered I to IX, on a dark blue background.
 
 | | |
 |---|---|
 | greeting | `fish_greeting` in `config/fish/config.fish` (`fetch` prints it again) |
-| the picture | `rice-statue` downloads one from wallhaven.cc, crops the face square and keeps it in `~/.local/share/rice/statue.png` |
+| the statue | `rice-statue` downloads a picture of David from wallhaven.cc, crops the face square and draws it as ASCII (`~/.local/share/rice/statue.txt`) |
 | another picture | `rice-statue next` (the next most-favourited), or `rice-statue <id>` for one you picked (`wallhaven.cc/w/<id>`) |
-| no picture yet | the greeting shows just the info and fetches one in the background for the next terminal |
+| photo instead of ASCII | `rice-statue picture` (kitty only); `rice-statue ascii` back |
+| none yet | the greeting shows just the info and fetches one in the background for the next terminal |
 | layout and colours | `config/matugen/templates/fastfetch.jsonc` |
 | background | `background` at the end of `config/kitty/kitty.conf` |
 
