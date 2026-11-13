@@ -7,15 +7,28 @@
 #   rice-shot window    the focused window
 #   rice-shot area edit the same, then opens it in satty to draw on
 #                       (saved beside it as ..._edited.png)
+#   rice-shot area copy copy only, no file; the notification has a Save button
+#                       in case you want to keep it after all
+#                       (works with screen and window too)
 #
 # The capture menu (Super+Shift+S) runs this too.
 set -uo pipefail
 
 mode="${1:-area}"
-edit="${2:-}"
+extra="${2:-}"             # edit | copy
 dir="$HOME/Pictures/Screenshots"
-file="$dir/Screenshot_$(date +%Y-%m-%d_%H-%M-%S).png"
-mkdir -p "$dir"
+name="Screenshot_$(date +%Y-%m-%d_%H-%M-%S).png"
+saved="$dir/$name"
+if [[ "$extra" == copy ]]; then
+    # copy only: the picture waits in a temporary file (for the notification's
+    # preview and its Save button) and is gone after a restart
+    file="${XDG_RUNTIME_DIR:-/tmp}/rice-shot/$name"
+    mkdir -p "$(dirname "$file")"
+    find "$(dirname "$file")" -name '*.png' -mmin +60 -delete 2>/dev/null
+else
+    file="$saved"
+    mkdir -p "$dir"
+fi
 
 fail() {
     notify-send -a Capture -u critical "Screenshot failed" "$1"
@@ -41,25 +54,37 @@ case "$mode" in
         [[ -n "$geo" ]] || fail "no focused window"
         grim -g "$geo" "$file" || fail "grim could not capture the window" ;;
     *)
-        echo "usage: rice-shot area|screen|window [edit]" >&2
+        echo "usage: rice-shot area|screen|window [edit|copy]" >&2
         exit 2 ;;
 esac
 
 wl-copy --type image/png < "$file"
 echo "$file"
 
-if [[ "$edit" == edit ]]; then
-    satty --filename "$file" --output-filename "${file%.png}_edited.png" &
+edited="$dir/${name%.png}_edited.png"     # edits always land in Screenshots
+if [[ "$extra" == edit ]]; then
+    mkdir -p "$dir"
+    satty --filename "$file" --output-filename "$edited" &
 fi
 
 # The notification waits for a click, so it runs in the background.
 (
-    act="$(notify-send -a Capture -i "$file" -A open=Open -A edit=Edit -A folder="Show in folder" \
-        "Screenshot saved" "$(basename "$file") · in Pictures/Screenshots · copied to the clipboard")"
-    case "$act" in
-        open)   xdg-open "$file" ;;
-        edit)   satty --filename "$file" --output-filename "${file%.png}_edited.png" ;;
-        folder) thunar "$dir" ;;
-    esac
+    if [[ "$extra" == copy ]]; then
+        act="$(notify-send -a Capture -i "$file" -A save=Save -A edit=Edit \
+            "Screenshot copied" "Not saved · press Save to keep it in Pictures/Screenshots")"
+        case "$act" in
+            save) mkdir -p "$dir" && cp "$file" "$saved" \
+                    && notify-send -a Capture -i "$saved" "Screenshot saved" "$name · in Pictures/Screenshots" ;;
+            edit) mkdir -p "$dir" && satty --filename "$file" --output-filename "$edited" ;;
+        esac
+    else
+        act="$(notify-send -a Capture -i "$file" -A open=Open -A edit=Edit -A folder="Show in folder" \
+            "Screenshot saved" "$name · in Pictures/Screenshots · copied to the clipboard")"
+        case "$act" in
+            open)   xdg-open "$file" ;;
+            edit)   satty --filename "$file" --output-filename "$edited" ;;
+            folder) thunar "$dir" ;;
+        esac
+    fi
 ) >/dev/null 2>&1 &
 disown

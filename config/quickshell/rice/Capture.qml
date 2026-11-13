@@ -27,6 +27,9 @@ Scope {
     property int elapsed: 0
     property bool desktopAudio: true
     property bool micAudio: false
+    // Screenshots: save a file and copy (on), or only copy (off). Remembered.
+    property bool saveShots: Toggles.get("saveShots", true)
+    onSaveShotsChanged: Toggles.set("saveShots", saveShots)
     property bool picking: false
     property var pickCallback: null
 
@@ -66,7 +69,10 @@ Scope {
     // same tools that work from a terminal. The pause lets the menu fade out.
     function screenshot(mode) {
         console.info("capture: rice-shot", mode)
-        later(() => Quickshell.execDetached([root.home + "/.local/bin/rice-shot", mode]))
+        const args = [root.home + "/.local/bin/rice-shot", mode]
+        if (!saveShots)
+            args.push("copy")
+        later(() => Quickshell.execDetached(args))
     }
 
     // A notification with buttons. notify-send -A waits for the click, so it

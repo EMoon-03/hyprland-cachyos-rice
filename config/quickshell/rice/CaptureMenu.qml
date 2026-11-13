@@ -298,6 +298,53 @@ Scope {
                         }
                     }
 
+                    // save a file too, or only copy (remembered)
+                    Rectangle {
+                        Layout.fillWidth: true
+                        visible: !(root.capture && root.capture.recording)
+                        implicitHeight: saveRow.implicitHeight + 20
+                        radius: 18
+                        color: Theme.alpha(Theme.surface_container_high, 0.85)
+
+                        RowLayout {
+                            id: saveRow
+                            anchors.fill: parent
+                            anchors.margins: 10
+                            anchors.leftMargin: 16
+                            spacing: 12
+
+                            LucideIcon {
+                                icon: root.capture && root.capture.saveShots ? "save" : "clipboard"
+                                size: 17
+                            }
+
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 0
+
+                                Text {
+                                    text: "Save to Pictures"
+                                    color: Theme.on_surface
+                                    font.family: Theme.font
+                                    font.pixelSize: 14
+                                }
+
+                                Text {
+                                    text: root.capture && root.capture.saveShots
+                                        ? "saved and copied" : "copied only - Save in the notification keeps it"
+                                    color: Theme.on_surface_variant
+                                    font.family: Theme.font
+                                    font.pixelSize: 11
+                                }
+                            }
+
+                            CcSwitch {
+                                checked: root.capture ? root.capture.saveShots : true
+                                onToggled: root.capture.saveShots = !root.capture.saveShots
+                            }
+                        }
+                    }
+
                     // ------------------------------------------------- record --
                     SectionLabel {
                         visible: !(root.capture && root.capture.recording)
