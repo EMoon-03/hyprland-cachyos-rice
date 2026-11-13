@@ -9,9 +9,11 @@
 #                       (saved beside it as ..._edited.png)
 #   rice-shot area copy copy only, no file; the notification has a Save button
 #                       in case you want to keep it after all
-#   rice-shot area ask  after taking it, ask: Save and copy / Copy only / Edit /
-#                       Cancel (Esc = Cancel)
+#   rice-shot area ask  after taking it, show it with Save / Copy / Edit / Cancel
+#                       under it (ShotReview.qml; Esc = Cancel)
 #                       (edit, copy and ask work with screen and window too)
+#   rice-shot finish <save|copy|edit|cancel> <file>
+#                       what the review card runs for the button you pick
 #
 # The capture menu (Super+Shift+S) runs this too, with "ask" unless that's
 # switched off there.
@@ -22,7 +24,15 @@ extra="${2:-}"             # edit | copy | ask
 dir="$HOME/Pictures/Screenshots"
 name="Screenshot_$(date +%Y-%m-%d_%H-%M-%S).png"
 saved="$dir/$name"
-if [[ "$extra" == copy || "$extra" == ask ]]; then
+if [[ "$mode" == finish ]]; then
+    # the review card's choice for a shot already taken: $2 = choice, $3 = file
+    choice="${2:-cancel}"
+    file="${3:-}"
+    [[ -f "$file" ]] || exit 1
+    name="$(basename "$file")"
+    saved="$dir/$name"
+    extra=""
+elif [[ "$extra" == copy || "$extra" == ask ]]; then
     # copy only (or not decided yet): the picture waits in a temporary file (for
     # the notification's preview and its Save button), gone after a restart
     file="${XDG_RUNTIME_DIR:-/tmp}/rice-shot/$name"
@@ -46,6 +56,8 @@ accent="$(jq -r '.primary // empty' "$HOME/.cache/rice/quickshell-colors.json" 2
 slurp_look=(-d -w 2 -b "#00000073" -c "${accent}ff" -s "#00000000")
 
 case "$mode" in
+    finish)
+        ;;                                                # already taken
     area)
         geo="$(slurp "${slurp_look[@]}")" || exit 0       # Esc: cancelled, no message
         grim -g "$geo" "$file" || fail "grim could not capture the area" ;;
@@ -61,16 +73,21 @@ case "$mode" in
         exit 2 ;;
 esac
 
-# ask: what to do with it
+# ask: show it on the review card and stop here; the card runs
+# `rice-shot finish <choice> <file>`. Without the shell, just save and copy.
 if [[ "$extra" == ask ]]; then
-    choice="$(printf '%s\n' "󰆓  Save and copy" "󰆏  Copy only" "󰏫  Edit" "󰜺  Cancel" \
-        | rofi -dmenu -i -no-custom -p "screenshot" -theme ~/.config/rofi/menu.rasi \
-               -theme-str 'listview { lines: 4; }')" || choice=""
+    if qs -c rice ipc call capture review "$file" >/dev/null 2>&1; then
+        exit 0
+    fi
+    choice=save
+fi
+
+if [[ -n "${choice:-}" ]]; then
     case "$choice" in
-        *Save*) mkdir -p "$dir" && mv "$file" "$saved" && file="$saved"; extra="" ;;
-        *Copy*) extra=copy ;;
-        *Edit*) mkdir -p "$dir" && mv "$file" "$saved" && file="$saved"; extra=edit ;;
-        *)      rm -f "$file"; exit 0 ;;                  # Cancel or Esc: nothing kept or copied
+        save) mkdir -p "$dir" && mv "$file" "$saved" && file="$saved"; extra="" ;;
+        copy) extra=copy ;;
+        edit) mkdir -p "$dir" && mv "$file" "$saved" && file="$saved"; extra=edit ;;
+        *)    rm -f "$file"; exit 0 ;;                    # Cancel or Esc: nothing kept or copied
     esac
 fi
 

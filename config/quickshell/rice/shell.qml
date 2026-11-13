@@ -36,6 +36,7 @@ ShellRoot {
     NotificationPopups {}
     NotificationCenter { id: notifs }
     Capture { id: capture }
+    ShotReview { id: shotReview }
     Lock { id: locker }
     CaptureMenu {
         id: captureMenu
@@ -97,6 +98,8 @@ ShellRoot {
         function menu(): void { shell.closeOthers(captureMenu); captureMenu.toggle() }
         // screen | window | area
         function screenshot(mode: string): void { shell.closeOthers(null); capture.screenshot(mode) }
+        // a shot waiting for Save / Copy / Edit / Cancel (rice-shot ... ask)
+        function review(path: string): void { shell.closeOthers(null); shotReview.review(path) }
         // screen | area
         function record(mode: string): void { shell.closeOthers(null); capture.record(mode) }
         function stop(): void { capture.stop() }
