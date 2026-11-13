@@ -33,14 +33,18 @@ rice.bindm  = binder({ mouse = true })                     -- drag with a mouse 
 -- changes: { { committed_keys, n, new_keys }, ... } where n picks between binds
 -- that share committed keys (1 for the usual case). All are removed before any
 -- is bound again: in a swap one bind's new keys are the other's old ones.
+-- A change for a bind that no longer exists (an update removed it, while
+-- conf.d/30-binds.lua still remembers moving it) is skipped, not an error that
+-- would stop the rest of the config loading.
 function rice.rebind(changes)
     local todo = {}
     for _, ch in ipairs(changes) do
         local entry = (rice.binds[ch[1]] or {})[ch[2] or 1]
-        if not entry then
-            error("rice.rebind: no bind committed as \"" .. tostring(ch[1]) .. "\"")
+        if entry then
+            todo[#todo + 1] = { entry = entry, keys = ch[3] }
+        else
+            print("rice.rebind: skipped - no bind committed as \"" .. tostring(ch[1]) .. "\"")
         end
-        todo[#todo + 1] = { entry = entry, keys = ch[3] }
     end
     for _, t in ipairs(todo) do
         t.entry.handle:remove()
