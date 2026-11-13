@@ -9,7 +9,7 @@
 //   recordings   gpu-screen-recorder -> ~/Videos/Recordings: mp4, 60 fps,
 //                desktop audio and optionally the mic. Stopped with SIGINT,
 //                which is what makes it finish the file.
-//   area         a drag-to-select overlay on every monitor (Esc cancels)
+//   area         slurp: drag to select, on any monitor (Esc cancels)
 //   bar          ~/.cache/rice/recording holds the start time while recording;
 //                waybar's recording pill counts from it
 //
@@ -18,7 +18,6 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import Quickshell.Wayland
 import Quickshell.Hyprland
 
 Scope {
@@ -212,11 +211,16 @@ Scope {
     }
 
     // --------------------------------------------------------- area picker --
+    // slurp draws the selection (drag; Esc or a click without dragging cancels).
+    // It replaced a home-made overlay whose selection could vanish mid-drag.
     function pick(callback) {
         if (picking)
             return
         pickCallback = callback
-        later(() => root.picking = true)
+        later(() => {
+            root.picking = true
+            slurp.running = true
+        })
     }
 
     function finishPick(geometry) {
@@ -227,146 +231,24 @@ Scope {
             later(() => callback(geometry))
     }
 
-    LazyLoader {
-        active: root.picking
-
-        Variants {
-            model: Quickshell.screens
-
-            PanelWindow {
-                id: picker
-                required property var modelData
-
-                property point a
-                property point b
-                property bool dragging: false
-                readonly property rect sel: dragging
-                    ? Qt.rect(Math.min(a.x, b.x), Math.min(a.y, b.y), Math.abs(a.x - b.x), Math.abs(a.y - b.y))
-                    : Qt.rect(0, 0, 0, 0)
-
-                screen: modelData
-                anchors {
-                    top: true
-                    bottom: true
-                    left: true
-                    right: true
-                }
-                exclusionMode: ExclusionMode.Ignore
-                color: "transparent"
-                WlrLayershell.layer: WlrLayer.Overlay
-                WlrLayershell.namespace: "rice-areapicker"
-                WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
-
-                // Dim everything outside the selection.
-                Rectangle {
-                    x: 0; y: 0
-                    width: parent.width
-                    height: picker.sel.y
-                    color: Qt.rgba(0, 0, 0, 0.45)
-                }
-                Rectangle {
-                    x: 0
-                    y: picker.sel.y + picker.sel.height
-                    width: parent.width
-                    height: parent.height - y
-                    color: Qt.rgba(0, 0, 0, 0.45)
-                }
-                Rectangle {
-                    x: 0
-                    y: picker.sel.y
-                    width: picker.sel.x
-                    height: picker.sel.height
-                    color: Qt.rgba(0, 0, 0, 0.45)
-                }
-                Rectangle {
-                    x: picker.sel.x + picker.sel.width
-                    y: picker.sel.y
-                    width: parent.width - x
-                    height: picker.sel.height
-                    color: Qt.rgba(0, 0, 0, 0.45)
-                }
-
-                Rectangle {
-                    visible: picker.dragging
-                    x: picker.sel.x
-                    y: picker.sel.y
-                    width: picker.sel.width
-                    height: picker.sel.height
-                    color: "transparent"
-                    border.width: 2
-                    border.color: Theme.primary
-                }
-
-                Rectangle {
-                    visible: picker.dragging && picker.sel.width > 0
-                    x: picker.sel.x
-                    y: Math.max(0, picker.sel.y - height - 6)
-                    implicitWidth: sizeText.implicitWidth + 16
-                    implicitHeight: 24
-                    radius: 8
-                    color: Theme.surface_container
-
-                    Text {
-                        id: sizeText
-                        anchors.centerIn: parent
-                        text: Math.round(picker.sel.width) + " × " + Math.round(picker.sel.height)
-                        color: Theme.on_surface
-                        font.family: Theme.mono
-                        font.pixelSize: 12
-                    }
-                }
-
-                Rectangle {
-                    visible: !picker.dragging
-                    anchors.centerIn: parent
-                    implicitWidth: hint.implicitWidth + 32
-                    implicitHeight: 44
-                    radius: 22
-                    color: Theme.alpha(Theme.surface_container, 0.95)
-
-                    Text {
-                        id: hint
-                        anchors.centerIn: parent
-                        text: "Drag to select an area  ·  Esc to cancel"
-                        color: Theme.on_surface
-                        font.family: Theme.font
-                        font.pixelSize: 14
-                    }
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.CrossCursor
-                    onPressed: mouse => {
-                        picker.a = Qt.point(mouse.x, mouse.y)
-                        picker.b = picker.a
-                        picker.dragging = true
-                    }
-                    onPositionChanged: mouse => {
-                        if (picker.dragging)
-                            picker.b = Qt.point(mouse.x, mouse.y)
-                    }
-                    onReleased: {
-                        const r = picker.sel
-                        picker.dragging = false
-                        if (r.width < 4 || r.height < 4) {
-                            root.finishPick(null)
-                            return
-                        }
-                        // Global logical coordinates, as grim -g expects.
-                        const x = Math.round(picker.modelData.x + r.x), y = Math.round(picker.modelData.y + r.y)
-                        const w = Math.round(r.width), h = Math.round(r.height)
-                        root.finishPick({ grim: `${x},${y} ${w}x${h}`, gsr: `${w}x${h}+${x}+${y}` })
-                    }
-                }
-
-                Item {
-                    anchors.fill: parent
-                    focus: true
-                    Component.onCompleted: forceActiveFocus()
-                    Keys.onEscapePressed: root.finishPick(null)
-                }
+    Process {
+        id: slurp
+        command: ["slurp", "-d", "-w", "2",
+            "-b", "#00000073",
+            "-c", String(Theme.primary).slice(0, 7) + "ff",
+            "-s", "#00000000",
+            "-f", "%x %y %w %h"]
+        stdout: StdioCollector {
+            id: slurpOut
+        }
+        onExited: code => {
+            const v = slurpOut.text.trim().split(/\s+/).map(Number)
+            if (code !== 0 || v.length !== 4 || v.some(isNaN) || v[2] < 4 || v[3] < 4) {
+                root.finishPick(null)
+                return
             }
+            const [x, y, w, h] = v          // global logical coordinates, as grim -g expects
+            root.finishPick({ grim: `${x},${y} ${w}x${h}`, gsr: `${w}x${h}+${x}+${y}` })
         }
     }
 }
