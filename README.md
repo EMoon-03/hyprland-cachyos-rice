@@ -57,21 +57,18 @@ else.
 | palette | matugen | `config/matugen` |
 | idle, lock fallback | hypridle, hyprlock | `config/hypr` |
 
-## Arcade greeting (this fork)
+## Roman greeting (this fork)
 
-Every new terminal opens on an arcade start screen: **ORIGIN** in pixel letters,
-a **Hall of Fame** where your parts are the high scores, and a short Pac-Man run
-across the middle. Each dot he eats adds 10 to your **1UP** score (the power
-pellet adds 50 and scares the ghosts), and the score carries over, so it climbs
-every time you open a terminal.
+Every new terminal opens on a small marble Roman bust with a gold laurel wreath,
+beside the system info numbered I to IX, on a dark blue background.
 
 | | |
 |---|---|
-| greeting | `local/bin/arcade-fetch` (fastfetch + the Pac-Man run) |
-| layout and colours | `config/matugen/templates/fastfetch.jsonc`, title art in `config/fastfetch/arcade-title.txt` |
-| score | `~/.local/state/arcade/score`; delete it to reset |
-| no animation | `set -Ux ARCADE_NO_ANIM 1` (the score still goes up) |
-| old greeting back | point `fish_greeting` in `config/fish/config.fish` at `~/.local/bin/rice-fetch.sh` |
+| greeting | `fastfetch` (from `fish_greeting` in `config/fish/config.fish`; `fetch` prints it again) |
+| layout and colours | `config/matugen/templates/fastfetch.jsonc` |
+| the bust | `config/fastfetch/roman-bust.ansi` (24 x 13 half-block pixel art) |
+| background | `background` at the end of `config/kitty/kitty.conf` |
+| old greeting back | point `fish_greeting` at `~/.local/bin/rice-fetch.sh` |
 
 ## Requirements
 

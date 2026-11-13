@@ -8,12 +8,11 @@ end
 #    # smth smth
 #end
 
-# Greeting: the arcade screen (local/bin/arcade-fetch). It prints fastfetch, then
-# Pac-Man runs across the attract row and every dot adds to the 1UP score, which
-# carries over between terminals. ARCADE_NO_ANIM=1 skips the run.
+# Greeting: fastfetch with a small marble Roman bust
+# (~/.config/matugen/templates/fastfetch.jsonc).
 # The old picture/GIF greeting is still there: ~/.local/bin/rice-fetch.sh
 function fish_greeting
-    ~/.local/bin/arcade-fetch
+    fastfetch
 end
 
 # `y`: Yazi, and when you quit it the terminal is left in the folder you were in.
@@ -28,5 +27,5 @@ end
 
 # `fetch` prints it again (handy after resizing the window).
 function fetch
-    ~/.local/bin/arcade-fetch
+    fastfetch
 end
