@@ -27,9 +27,10 @@ Scope {
     property int elapsed: 0
     property bool desktopAudio: true
     property bool micAudio: false
-    // Screenshots: save a file and copy (on), or only copy (off). Remembered.
-    property bool saveShots: Toggles.get("saveShots", true)
-    onSaveShotsChanged: Toggles.set("saveShots", saveShots)
+    // Screenshots: ask after each one - Save and copy / Copy only / Edit /
+    // Cancel (on), or save and copy straight away (off). Remembered.
+    property bool askShots: Toggles.get("askShots", true)
+    onAskShotsChanged: Toggles.set("askShots", askShots)
     property bool picking: false
     property var pickCallback: null
 
@@ -70,8 +71,8 @@ Scope {
     function screenshot(mode) {
         console.info("capture: rice-shot", mode)
         const args = [root.home + "/.local/bin/rice-shot", mode]
-        if (!saveShots)
-            args.push("copy")
+        if (askShots)
+            args.push("ask")
         later(() => Quickshell.execDetached(args))
     }
 

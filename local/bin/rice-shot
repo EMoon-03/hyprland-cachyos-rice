@@ -9,19 +9,22 @@
 #                       (saved beside it as ..._edited.png)
 #   rice-shot area copy copy only, no file; the notification has a Save button
 #                       in case you want to keep it after all
-#                       (works with screen and window too)
+#   rice-shot area ask  after taking it, ask: Save and copy / Copy only / Edit /
+#                       Cancel (Esc = Cancel)
+#                       (edit, copy and ask work with screen and window too)
 #
-# The capture menu (Super+Shift+S) runs this too.
+# The capture menu (Super+Shift+S) runs this too, with "ask" unless that's
+# switched off there.
 set -uo pipefail
 
 mode="${1:-area}"
-extra="${2:-}"             # edit | copy
+extra="${2:-}"             # edit | copy | ask
 dir="$HOME/Pictures/Screenshots"
 name="Screenshot_$(date +%Y-%m-%d_%H-%M-%S).png"
 saved="$dir/$name"
-if [[ "$extra" == copy ]]; then
-    # copy only: the picture waits in a temporary file (for the notification's
-    # preview and its Save button) and is gone after a restart
+if [[ "$extra" == copy || "$extra" == ask ]]; then
+    # copy only (or not decided yet): the picture waits in a temporary file (for
+    # the notification's preview and its Save button), gone after a restart
     file="${XDG_RUNTIME_DIR:-/tmp}/rice-shot/$name"
     mkdir -p "$(dirname "$file")"
     find "$(dirname "$file")" -name '*.png' -mmin +60 -delete 2>/dev/null
@@ -57,6 +60,19 @@ case "$mode" in
         echo "usage: rice-shot area|screen|window [edit|copy]" >&2
         exit 2 ;;
 esac
+
+# ask: what to do with it
+if [[ "$extra" == ask ]]; then
+    choice="$(printf '%s\n' "󰆓  Save and copy" "󰆏  Copy only" "󰏫  Edit" "󰜺  Cancel" \
+        | rofi -dmenu -i -no-custom -p "screenshot" -theme ~/.config/rofi/menu.rasi \
+               -theme-str 'listview { lines: 4; }')" || choice=""
+    case "$choice" in
+        *Save*) mkdir -p "$dir" && mv "$file" "$saved" && file="$saved"; extra="" ;;
+        *Copy*) extra=copy ;;
+        *Edit*) mkdir -p "$dir" && mv "$file" "$saved" && file="$saved"; extra=edit ;;
+        *)      rm -f "$file"; exit 0 ;;                  # Cancel or Esc: nothing kept or copied
+    esac
+fi
 
 wl-copy --type image/png < "$file"
 echo "$file"

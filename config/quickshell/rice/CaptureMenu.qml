@@ -298,7 +298,7 @@ Scope {
                         }
                     }
 
-                    // save a file too, or only copy (remembered)
+                    // ask what to do after each screenshot, or just save + copy (remembered)
                     Rectangle {
                         Layout.fillWidth: true
                         visible: !(root.capture && root.capture.recording)
@@ -314,7 +314,7 @@ Scope {
                             spacing: 12
 
                             LucideIcon {
-                                icon: root.capture && root.capture.saveShots ? "save" : "clipboard"
+                                icon: root.capture && root.capture.askShots ? "list-checks" : "save"
                                 size: 17
                             }
 
@@ -323,15 +323,15 @@ Scope {
                                 spacing: 0
 
                                 Text {
-                                    text: "Save to Pictures"
+                                    text: "Ask what to do"
                                     color: Theme.on_surface
                                     font.family: Theme.font
                                     font.pixelSize: 14
                                 }
 
                                 Text {
-                                    text: root.capture && root.capture.saveShots
-                                        ? "saved and copied" : "copied only - Save in the notification keeps it"
+                                    text: root.capture && root.capture.askShots
+                                        ? "save, copy, edit or cancel after each shot" : "saved and copied straight away"
                                     color: Theme.on_surface_variant
                                     font.family: Theme.font
                                     font.pixelSize: 11
@@ -339,8 +339,8 @@ Scope {
                             }
 
                             CcSwitch {
-                                checked: root.capture ? root.capture.saveShots : true
-                                onToggled: root.capture.saveShots = !root.capture.saveShots
+                                checked: root.capture ? root.capture.askShots : true
+                                onToggled: root.capture.askShots = !root.capture.askShots
                             }
                         }
                     }
