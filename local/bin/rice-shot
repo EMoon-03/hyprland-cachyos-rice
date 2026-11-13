@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# Screenshots: grim + slurp, saved to ~/Pictures/Screenshots and copied to the
+# clipboard, then a notification with Open / Edit / Show in folder.
+#
+#   rice-shot area      drag to select (Esc cancels)
+#   rice-shot screen    the monitor the mouse is on
+#   rice-shot window    the focused window
+#   rice-shot area edit the same, then opens it in satty to draw on
+#                       (saved beside it as ..._edited.png)
+#
+# The capture menu (Super+Shift+S) runs this too.
+set -uo pipefail
+
+mode="${1:-area}"
+edit="${2:-}"
+dir="$HOME/Pictures/Screenshots"
+file="$dir/Screenshot_$(date +%Y-%m-%d_%H-%M-%S).png"
+mkdir -p "$dir"
+
+fail() {
+    notify-send -a Capture -u critical "Screenshot failed" "$1"
+    exit 1
+}
+
+case "$mode" in
+    area)
+        geo="$(slurp -d)" || exit 0                       # Esc: cancelled, no message
+        grim -g "$geo" "$file" || fail "grim could not capture the area" ;;
+    screen)
+        mon="$(hyprctl monitors -j | jq -r '.[] | select(.focused) | .name')"
+        grim ${mon:+-o "$mon"} "$file" || fail "grim could not capture the screen" ;;
+    window)
+        geo="$(hyprctl activewindow -j | jq -r 'select(.at) | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"')"
+        [[ -n "$geo" ]] || fail "no focused window"
+        grim -g "$geo" "$file" || fail "grim could not capture the window" ;;
+    *)
+        echo "usage: rice-shot area|screen|window [edit]" >&2
+        exit 2 ;;
+esac
+
+wl-copy --type image/png < "$file"
+echo "$file"
+
+if [[ "$edit" == edit ]]; then
+    satty --filename "$file" --output-filename "${file%.png}_edited.png" &
+fi
+
+# The notification waits for a click, so it runs in the background.
+(
+    act="$(notify-send -a Capture -i "$file" -A open=Open -A edit=Edit -A folder="Show in folder" \
+        "Screenshot saved" "$(basename "$file") · in Pictures/Screenshots · copied to the clipboard")"
+    case "$act" in
+        open)   xdg-open "$file" ;;
+        edit)   satty --filename "$file" --output-filename "${file%.png}_edited.png" ;;
+        folder) thunar "$dir" ;;
+    esac
+) >/dev/null 2>&1 &
+disown

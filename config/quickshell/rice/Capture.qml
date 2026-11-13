@@ -2,8 +2,9 @@
 // ScreenRecordService and AreaPicker - with gpu-screen-recorder, the GPU
 // encoder the replay buffer already uses, in place of wf-recorder.
 //
-//   screenshots  grim -> ~/Pictures/Screenshots, also copied to the clipboard.
-//                The notification offers Open, Edit (satty), Show in folder.
+//   screenshots  ~/.local/bin/rice-shot: grim -> ~/Pictures/Screenshots, also
+//                copied to the clipboard; the notification offers Open, Edit
+//                (satty), Show in folder.
 //   recordings   gpu-screen-recorder -> ~/Videos/Recordings: mp4, 60 fps,
 //                desktop audio and optionally the mic. Stopped with SIGINT,
 //                which is what makes it finish the file.
@@ -61,50 +62,11 @@ Scope {
 
     // --------------------------------------------------------- screenshots --
     // screen (the focused monitor) | window (the active one) | area
+    // Done by ~/.local/bin/rice-shot (grim + slurp, save, copy, notify) - the
+    // same tools that work from a terminal. The pause lets the menu fade out.
     function screenshot(mode) {
-        if (mode === "area")
-            pick(g => shoot(["-g", g.grim]))
-        else if (mode === "window")
-            later(() => windowGeometry.running = true)
-        else
-            later(() => shoot(["-o", focusedMonitor()]))
-    }
-
-    Process {
-        id: windowGeometry
-        command: ["hyprctl", "activewindow", "-j"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    const w = JSON.parse(text)
-                    root.shoot(["-g", `${w.at[0]},${w.at[1]} ${w.size[0]}x${w.size[1]}`])
-                } catch (e) {
-                    root.shoot(["-o", root.focusedMonitor()])     // no window: the monitor
-                }
-            }
-        }
-    }
-
-    function shoot(grimArgs) {
-        console.info("capture: grim", JSON.stringify(grimArgs))
-        if (shooter.running)
-            return
-        shooter.file = shotDir + "/Screenshot_" + stamp() + ".png"
-        shooter.command = ["bash", "-c",
-            'dir="$1"; file="$2"; shift 2; mkdir -p "$dir" && grim "$@" "$file" && wl-copy --type image/png < "$file"',
-            "_", shotDir, shooter.file].concat(grimArgs)
-        shooter.running = true
-    }
-
-    Process {
-        id: shooter
-        property string file: ""
-        onExited: code => {
-            if (code === 0)
-                root.notifyFile(file, "Screenshot saved", "copied to the clipboard", true)
-            else
-                Quickshell.execDetached(["notify-send", "-a", "Screenshot", "-u", "critical", "Screenshot failed", "grim exited with " + code])
-        }
+        console.info("capture: rice-shot", mode)
+        later(() => Quickshell.execDetached([root.home + "/.local/bin/rice-shot", mode]))
     }
 
     // A notification with buttons. notify-send -A waits for the click, so it
