@@ -97,6 +97,8 @@ ShellRoot {
         function menu(): void { shell.closeOthers(captureMenu); captureMenu.toggle() }
         // screen | window | area
         function screenshot(mode: string): void { shell.closeOthers(null); capture.screenshot(mode) }
+        // the same, then opens it in satty to draw on (saved next to it, "-edited")
+        function screenshotEdit(mode: string): void { shell.closeOthers(null); capture.screenshot(mode, true) }
         // screen | area
         function record(mode: string): void { shell.closeOthers(null); capture.record(mode) }
         function stop(): void { capture.stop() }

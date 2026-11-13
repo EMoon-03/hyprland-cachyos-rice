@@ -3,7 +3,9 @@
 // encoder the replay buffer already uses, in place of wf-recorder.
 //
 //   screenshots  grim -> ~/Pictures/Screenshots, also copied to the clipboard.
-//                The notification offers Open, Edit (satty), Show in folder.
+//                The notification shows it, says where it went, and offers
+//                Open, Edit (satty), Show in folder. Edits are saved next to
+//                the original as ..._edited.png.
 //   recordings   gpu-screen-recorder -> ~/Videos/Recordings: mp4, 60 fps,
 //                desktop audio and optionally the mic. Stopped with SIGINT,
 //                which is what makes it finish the file.
@@ -33,6 +35,7 @@ Scope {
     readonly property string home: Quickshell.env("HOME")
     readonly property string shotDir: home + "/Pictures/Screenshots"
     readonly property string videoDir: home + "/Videos/Recordings"
+    property bool editAfter: false
     readonly property string elapsedText: Math.floor(elapsed / 60) + ":" + (elapsed % 60 < 10 ? "0" : "") + elapsed % 60
 
     function stamp() {
@@ -62,7 +65,8 @@ Scope {
 
     // --------------------------------------------------------- screenshots --
     // screen (the focused monitor) | window (the active one) | area
-    function screenshot(mode) {
+    function screenshot(mode, withEditor) {
+        editAfter = withEditor === true
         if (mode === "area")
             pick(g => shoot(["-g", g.grim]))
         else if (mode === "window")
@@ -100,11 +104,20 @@ Scope {
         id: shooter
         property string file: ""
         onExited: code => {
-            if (code === 0)
-                root.notifyFile(file, "Screenshot saved", "copied to the clipboard", true)
+            if (code === 0) {
+                if (root.editAfter)
+                    root.edit(file)
+                root.notifyFile(file, "Screenshot saved", "in Pictures/Screenshots · copied to the clipboard", true)
+            }
             else
                 Quickshell.execDetached(["notify-send", "-a", "Screenshot", "-u", "critical", "Screenshot failed", "grim exited with " + code])
         }
+    }
+
+    // satty on a saved shot; its "save" writes <name>_edited.png beside it
+    function edit(file) {
+        Quickshell.execDetached(["satty", "--filename", file,
+            "--output-filename", file.replace(/\.png$/, "_edited.png"), "--early-exit"])
     }
 
     // A notification with buttons. notify-send -A waits for the click, so it
@@ -120,8 +133,8 @@ Scope {
             + 'fi\n'
             + 'case "$act" in\n'
             + '  open) xdg-open "$file" ;;\n'
-            + '  edit) satty --filename "$file" ;;\n'
-            + '  folder) thunar "$file" ;;\n'
+            + '  edit) satty --filename "$file" --output-filename "${file%.png}_edited.png" --early-exit ;;\n'
+            + '  folder) thunar "$(dirname "$file")" ;;\n'
             + 'esac',
             "_", file, title, note, isImage ? "yes" : "no"])
     }

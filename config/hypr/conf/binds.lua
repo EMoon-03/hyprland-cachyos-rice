@@ -46,10 +46,12 @@ bind("SUPER + SHIFT + G",      exec(bin .. "/rice-settings colour"))    -- G for
 bind("SUPER + SHIFT + B",      exec("pkill -USR1 -x waybar"))           -- hide/show the bar
 bind("SUPER + SHIFT + V",      exec("qs -c rice ipc call visualiser toggle"))      -- desktop visualiser
 
-bind("Print",                  exec([[grim -g "$(slurp)" - | wl-copy -t image/png]]))
-bind("SHIFT + Print",          exec([[grim - | wl-copy -t image/png]]))
-bind("SUPER + Print",          exec([[grim -g "$(slurp)" ~/Pictures/shot-$(date +%s).png]]))
-bind("CTRL + Print",           exec([[grim -g "$(slurp)" - | satty -f -]]))
+-- Screenshots: all saved to ~/Pictures/Screenshots, copied to the clipboard,
+-- with a notification (Open / Edit / Show in folder)
+bind("Print",                  exec("qs -c rice ipc call capture screenshot area"))     -- drag an area
+bind("SHIFT + Print",          exec("qs -c rice ipc call capture screenshot screen"))   -- this monitor
+bind("ALT + Print",            exec("qs -c rice ipc call capture screenshot window"))   -- this window
+bind("CTRL + Print",           exec("qs -c rice ipc call capture screenshotEdit area")) -- area, then draw on it
 bind("F8",                     exec(bin .. "/gsr-replay-save"))         -- save the last 3 min of the replay buffer
 
 -- ---------------------------------------------------- reading back / focus --
