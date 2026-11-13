@@ -32,7 +32,7 @@ else.
 - **Lock screen.** Built on ext-session-lock with PAM, and falls back to
   hyprlock if Quickshell is not running.
 - **Capture menu** (`Super+Shift+S`). Screenshot the screen, a window or an
-  area; record with gpu-screen-recorder.
+  area, with a preview card to save, copy, edit or cancel.
 - **Keybind menu** (`Super+/`). A searchable cheatsheet that can also rebind.
 - **Settings hub** (`Super+,`). Look (gaps, borders, rounding, blur) and
   displays (mode, scale, position, VRR) apply live, plus shortcuts to every
@@ -44,7 +44,7 @@ else.
 - **TTS Reader:** an audiobook-style reader for EPUB, PDF, DOCX and Markdown
   with per-paragraph voices, which can save a book as an `.m4b` for your phone.
 - **Extras:** read-aloud with a subtitle tile, focus mode, Do Not Disturb
-  while gaming, and a replay buffer on `F8`.
+  while gaming.
 
 | job | tool | lives in |
 |-----|------|----------|
@@ -159,11 +159,9 @@ is no longer read: make them again, and they are saved as `conf.d/*.lua`.
 | `Super+,` | settings hub |
 | `Super+/` | keybind cheatsheet and rebinding |
 | `Super+Shift+W` / `Super+Alt+W` / `Super+Ctrl+W` | themes & wallpapers / next wallpaper in the theme / search wallhaven |
-| `Super+Shift+S` | screenshot and record menu |
-| `Super+Shift+S` | capture menu: screenshot of the screen / a window / an area (saved to `~/Pictures/Screenshots`, copied, notified - `rice-shot`), or a recording |
+| `Super+Shift+S` | capture menu: screenshot of the screen / a window / an area (saved to `~/Pictures/Screenshots`, copied, notified - `rice-shot`) |
 | `Print` / `Shift+Print` | area / whole screen to the clipboard |
 | `Super+Print` / `Ctrl+Print` | area to `~/Pictures` / area into satty |
-| `F8` | save the replay buffer (needs `gsr-replay-start` running) |
 | `Super+V` | clipboard history |
 | `Super+C` / `Super+Shift+C` | chess.com (floating, workspace 1) / GNOME Chess against the bot |
 | `Super+X` | session menu |
@@ -249,7 +247,7 @@ qs -c rice ipc call <target> <function>
 #   dashboard      toggle | tab <overview|media|weather|alerts|system|productivity|github>
 #   controlcenter  toggle | page <wifi|bluetooth|ethernet|sound>
 #   notifications  toggle | clear | dnd | setDnd <true|false> | toggleDnd
-#   capture        menu | screenshot <screen|window|area> | record <screen|area> | stop
+#   capture        menu | screenshot <screen|window|area> | review <file>
 #   settings, binds                       toggle | open | close
 #   clock, visualiser, lyrics             toggle | show | hide
 #   lyrics         offset <seconds> | reload | status
@@ -259,9 +257,6 @@ qs -c rice ipc call <target> <function>
 ## Optional extras
 
 - **Read-aloud** (`Super+P`) and **TTS Reader** need piper TTS; see [PACKAGES.md](PACKAGES.md).
-- **Replay buffer:** run `gsr-replay-start` from your autostart; `F8` saves
-  the last 3 minutes to `~/Videos/Replays`. `GSR_MONITOR` and `GSR_MIC`
-  choose what it records.
 - **GameMode:** `config/gamemode.ini` turns on Do Not Disturb while a game
   runs. You need to be in the `gamemode` group.
 - **Wallhaven:** `Super+Ctrl+W` opens a panel with search, filters and sorting;
