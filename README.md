@@ -159,7 +159,7 @@ is no longer read: make them again, and they are saved as `conf.d/*.lua`.
 | `Super+,` | settings hub |
 | `Super+/` | keybind cheatsheet and rebinding |
 | `Super+Shift+W` / `Super+Alt+W` / `Super+Ctrl+W` | themes & wallpapers / next wallpaper in the theme / search wallhaven |
-| `Super+Shift+S` | capture menu: screenshot of the screen / a window / an area (saved to `~/Pictures/Screenshots`, copied, notified - `rice-shot`) |
+| `Super+Shift+S` | capture menu: screenshot of the screen / a window / an area (saved to `~/Pictures/Screenshots`, copied, notified - `Capture.qml`) |
 | `Print` / `Shift+Print` | area / whole screen to the clipboard |
 | `Super+Print` / `Ctrl+Print` | area to `~/Pictures` / area into satty |
 | `Super+V` | clipboard history |
@@ -247,7 +247,7 @@ qs -c rice ipc call <target> <function>
 #   dashboard      toggle | tab <overview|media|weather|alerts|system|productivity|github>
 #   controlcenter  toggle | page <wifi|bluetooth|ethernet|sound>
 #   notifications  toggle | clear | dnd | setDnd <true|false> | toggleDnd
-#   capture        menu | screenshot <screen|window|area> | review <file>
+#   capture        menu | screenshot <screen|window|area>
 #   settings, binds                       toggle | open | close
 #   clock, visualiser, lyrics             toggle | show | hide
 #   lyrics         offset <seconds> | reload | status

@@ -1,4 +1,4 @@
-// Screenshot review: after a shot is taken (rice-shot ... ask), a small card
+// Screenshot review: after a shot is taken (Capture.qml), a small card
 // over the dimmed screen shows the picture with four choices under it:
 //
 //   Save    to ~/Pictures/Screenshots (and copied)        Enter or S
@@ -7,7 +7,7 @@
 //   Cancel  throw it away                                 Esc, or click outside
 //
 // The shot waits in a temporary file until then; the choice is carried out by
-// `rice-shot finish <choice> <file>`.
+// Capture.finish(choice, file).
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -17,6 +17,7 @@ import Quickshell.Hyprland
 Scope {
     id: root
 
+    property var capture: null          // Capture, set in shell.qml
     property string file: ""
     property bool open: false
     property var targetScreen: null
@@ -31,7 +32,7 @@ Scope {
         if (!open)
             return
         open = false
-        Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/rice-shot", "finish", choice, file])
+        capture.finish(choice, file)
     }
 
     function focusedScreen() {

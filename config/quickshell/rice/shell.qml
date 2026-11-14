@@ -35,8 +35,8 @@ ShellRoot {
     Osd { id: osd }
     NotificationPopups {}
     NotificationCenter { id: notifs }
-    Capture { id: capture }
-    ShotReview { id: shotReview }
+    Capture { id: capture; review: shotReview }
+    ShotReview { id: shotReview; capture: capture }
     Lock { id: locker }
     CaptureMenu {
         id: captureMenu
@@ -98,8 +98,9 @@ ShellRoot {
         function menu(): void { shell.closeOthers(captureMenu); captureMenu.toggle() }
         // screen | window | area
         function screenshot(mode: string): void { shell.closeOthers(null); capture.screenshot(mode) }
-        // a shot waiting for Save / Copy / Edit / Cancel (rice-shot ... ask)
-        function review(path: string): void { shell.closeOthers(null); shotReview.review(path) }
+        // the shot Capture.qml took (its slurp/grim run detached and call back here):
+        // a file, "" when cancelled, or "error:<why>"
+        function taken(result: string): void { shell.closeOthers(null); capture.taken(result) }
     }
 
     IpcHandler {
