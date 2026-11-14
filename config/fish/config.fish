@@ -8,31 +8,20 @@ end
 #    # smth smth
 #end
 
-# Greeting: fastfetch beside a photo of Michelangelo's David
-# (~/.local/share/rice/statue.png) in kitty; other terminals get it as ASCII art
-# (statue.txt). `rice-statue ascii` for the ASCII in kitty too, `rice-statue
-# picture` back, `rice-statue next` for another picture of him. If there's none
-# yet, it's fetched in the background for the next terminal and this one shows
-# just the info.
+# Greeting: fastfetch as a Servant's status sheet beside the seal of Ur-Nungal,
+# king of Uruk: his name in gold cuneiform on lapis (~/.config/fastfetch/
+# ur-nungal.png). The seal needs kitty; other terminals get just the sheet.
 function fish_greeting
-    set -l dir ~/.local/share/rice
-    set -l mode picture
-    test -f $dir/statue.mode; and set mode (cat $dir/statue.mode)
-    set -l pad --logo-padding-top 1 --logo-padding-left 2 --logo-padding-right 3
-    if test $mode = picture; and test "$TERM" = xterm-kitty; and test -f $dir/statue.png
-        command fastfetch --logo-type kitty-direct --logo $dir/statue.png --logo-width 24 --logo-height 12 $pad
-    else if test -f $dir/statue.txt
-        command fastfetch --logo-type file-raw --logo $dir/statue.txt $pad
+    set -l seal ~/.config/fastfetch/ur-nungal.png
+    if test "$TERM" = xterm-kitty; and test -f $seal
+        command fastfetch --logo-type kitty-direct --logo $seal --logo-width 26 --logo-height 13 \
+            --logo-padding-top 1 --logo-padding-left 2 --logo-padding-right 3
     else
         command fastfetch
-        if command -q rice-statue
-            rice-statue >/dev/null 2>&1 &
-            disown
-        end
     end
 end
 
-# plain `fastfetch` shows the statue too; with options it's fastfetch as usual
+# plain `fastfetch` shows the seal too; with options it's fastfetch as usual
 function fastfetch
     if test (count $argv) -eq 0
         fish_greeting
