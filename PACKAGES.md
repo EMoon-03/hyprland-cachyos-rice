@@ -13,7 +13,7 @@ sudo pacman -S --needed \
   pavucontrol nm-connection-editor hyprsunset \
   jq curl git imagemagick libnotify python python-numpy python-pillow \
   cava fastfetch btop thunar tumbler gvfs udiskie yazi xorg-xrandr github-cli \
-  adw-gtk-theme qt6ct nwg-look papirus-icon-theme ttf-jetbrains-mono-nerd inter-font noto-fonts
+  adw-gtk-theme qt6ct nwg-look papirus-icon-theme ttf-jetbrains-mono-nerd inter-font noto-fonts noto-fonts-cjk
 ```
 
 Plus `bibata-cursor-theme-bin` from the AUR, or change `XCURSOR_THEME` in

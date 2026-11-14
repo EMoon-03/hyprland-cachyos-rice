@@ -57,21 +57,21 @@ else.
 | palette | matugen | `config/matugen` |
 | idle, lock fallback | hypridle, hyprlock | `config/hypr` |
 
-## Uruk greeting (this fork)
+## Eien-dō greeting (this fork)
 
-Every new terminal (and plain `fastfetch`) opens on the seal of Ur-Nungal, son of
-Gilgamesh and king of Uruk: his name in gold cuneiform (𒌨 𒀭 𒉣 𒃲, UR DINGIR NUN
-GAL) on lapis lazuli in a band of Ishtar-gate rosettes. Beside it the system is
-a Servant's status sheet: Master, True Name, Class, Spirit Origin, then STR, MANA,
-END, AGI and LUCK for the CPU, GPU, RAM, disk and uptime, and the shell as the
-Noble Phantasm.
+Every new terminal (and plain `fastfetch`) opens on the shop sign of 永遠堂
+(Eien-dō, the Hall of Eternity): a dark oak plank with the name cut between two
+snapped ink lines and, much smaller, 𒂍 𒁕 𒊑 (é da-rí, "house of forever") in
+cuneiform, hung on a nail. Beside it the system is the workshop's job ticket:
+for, received, frame, grain, finish, joinery, stock, tools, open, and ready
+(tomorrow).
 
 | | |
 |---|---|
 | greeting | `fish_greeting` in `config/fish/config.fish` (`fetch` or `fastfetch` prints it again) |
-| the seal | `config/fastfetch/ur-nungal.png` (kitty only; other terminals show just the sheet) |
-| the sheet, colours | `config/matugen/templates/fastfetch.jsonc` |
-| cuneiform font | Noto Sans Cuneiform, in `noto-fonts` |
+| the sign | `config/fastfetch/eien-do.png` (kitty only; other terminals show just the ticket) |
+| the ticket, colours | `config/matugen/templates/fastfetch.jsonc` |
+| fonts | 永遠堂 needs a Japanese font (`noto-fonts-cjk`), 𒂍 𒁕 𒊑 Noto Sans Cuneiform (`noto-fonts`) |
 | background | `background` at the end of `config/kitty/kitty.conf` |
 
 ## Requirements

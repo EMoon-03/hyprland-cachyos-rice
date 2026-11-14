@@ -147,6 +147,7 @@ if command -v pacman >/dev/null; then
     [[ "$fonts" == *"JetBrainsMono Nerd Font"* ]] || missing+=(ttf-jetbrains-mono-nerd)
     [[ "$fonts" == *"Inter"* ]] || missing+=(inter-font)
     [[ "$fonts" == *"Noto Sans Cuneiform"* ]] || missing+=(noto-fonts)
+    [[ "$fonts" == *"Noto Sans CJK"* ]] || missing+=(noto-fonts-cjk)
     if (( ${#missing[@]} )); then
         echo "  missing:  sudo pacman -S --needed ${missing[*]}"
     else
