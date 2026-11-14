@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # The terminal greeting's statue: Michelangelo's David from wallhaven.cc, cropped
-# square around the face and drawn as ASCII art beside the system info (any
-# terminal). In kitty it can show the photo itself instead.
+# square around the face and shown beside the system info: the photo itself in
+# kitty, ASCII art in other terminals (or in kitty too, if you prefer it).
 #
 #   rice-statue             the most-favourited SFW picture of David
 #   rice-statue next        the next one in that list (keep going until you like one)
 #   rice-statue <id>        a picture you picked: the id is the end of its link,
 #                           wallhaven.cc/w/<id> (find one with Super+Ctrl+W or the site)
-#   rice-statue ascii       show it as ASCII art (the default)
-#   rice-statue picture     show the photo instead (kitty only)
+#   rice-statue picture     show the photo (the default; kitty only)
+#   rice-statue ascii       show it as ASCII art instead
 #   rice-statue clear       remove it (the greeting fetches the first one again)
 #
 # Kept in ~/.local/share/rice/ (statue.png, statue.txt, its wallhaven id and the

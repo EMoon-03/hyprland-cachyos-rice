@@ -59,15 +59,16 @@ else.
 
 ## Statue greeting (this fork)
 
-Every new terminal opens on Michelangelo's David as ASCII art beside the system
-info numbered I to IX, on a dark blue background.
+Every new terminal (and plain `fastfetch`) opens on a photo of Michelangelo's
+David beside the system info numbered I to IX, on a dark blue background. Outside
+kitty it's drawn as ASCII art instead.
 
 | | |
 |---|---|
-| greeting | `fish_greeting` in `config/fish/config.fish` (`fetch` prints it again) |
-| the statue | `rice-statue` downloads a picture of David from wallhaven.cc, crops the face square and draws it as ASCII (`~/.local/share/rice/statue.txt`) |
+| greeting | `fish_greeting` in `config/fish/config.fish` (`fetch` or `fastfetch` prints it again) |
+| the statue | `rice-statue` downloads a picture of David from wallhaven.cc, crops the face square (`~/.local/share/rice/statue.png`) and draws an ASCII copy (`statue.txt`) |
 | another picture | `rice-statue next` (the next most-favourited), or `rice-statue <id>` for one you picked (`wallhaven.cc/w/<id>`) |
-| photo instead of ASCII | `rice-statue picture` (kitty only); `rice-statue ascii` back |
+| ASCII instead of the photo | `rice-statue ascii`; `rice-statue picture` back |
 | none yet | the greeting shows just the info and fetches one in the background for the next terminal |
 | layout and colours | `config/matugen/templates/fastfetch.jsonc` |
 | background | `background` at the end of `config/kitty/kitty.conf` |
