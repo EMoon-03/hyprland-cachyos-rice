@@ -15,7 +15,7 @@
   },
   "modules": [
     "break",
-    { "type": "custom", "format": "{#1;38;2;232;224;208}永遠堂{#0}{#38;2;142;151;171}  Eien-dō · {#38;2;212;175;55}𒂍 𒁕 𒊑" },
+    { "type": "custom", "format": "{#1;38;2;232;224;208}永遠堂{#0}{#38;2;142;151;171}  Eien-dō · {#1;38;2;240;196;72}𒂍 𒁕 𒊑" },
     { "type": "custom", "format": "{#38;2;93;102;128}──────────────────────────────" },
     { "type": "title",  "key": "for",      "format": "{user-name}" },
     { "type": "os",     "key": "received", "format": "{pretty-name}" },
