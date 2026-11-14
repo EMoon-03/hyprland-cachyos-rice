@@ -59,18 +59,17 @@ else.
 
 ## Eien-dō greeting (this fork)
 
-Every new terminal (and plain `fastfetch`) opens under the name board of 永遠堂
-(Eien-dō, the Hall of Eternity): black lacquer with gilt corners, the name in
-gold leaf read right to left the old way (堂遠永), 𒂍 𒁕 𒊑 (é da-rí, "house of
-forever") in cuneiform beneath, and the maker's vermilion seal (永遠 / 堂𒂍)
-stamped at the end. Under it the system is the workshop's job ticket: for,
-received, frame, grain, finish, joinery, stock, tools, open, and ready
-(tomorrow).
+Every new terminal (and plain `fastfetch`) opens with the seal of 永遠堂 (Eien-dō,
+the Hall of Eternity): a vermilion stamp, a little crooked and unevenly inked,
+with 永遠 / 堂 cut in white and 𒂍 (é, "house", beside 堂, "hall") in gold leaf.
+Beside it the system is the workshop's job ticket, headed 𒂍 𒁕 𒊑 (é da-rí,
+"house of forever") in gold: for, received, frame, grain, finish, joinery,
+stock, tools, open, and ready (tomorrow).
 
 | | |
 |---|---|
 | greeting | `fish_greeting` in `config/fish/config.fish` (`fetch` or `fastfetch` prints it again) |
-| the board | `config/fastfetch/eien-do.png` (kitty only; other terminals show just the ticket) |
+| the seal | `config/fastfetch/eien-do.png` (kitty only; other terminals show just the ticket) |
 | the ticket, colours | `config/matugen/templates/fastfetch.jsonc` |
 | fonts | 永遠堂 needs a Japanese font (`noto-fonts-cjk`), 𒂍 𒁕 𒊑 Noto Sans Cuneiform (`noto-fonts`) |
 | background | `background` at the end of `config/kitty/kitty.conf` |

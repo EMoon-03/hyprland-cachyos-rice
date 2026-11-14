@@ -9,19 +9,19 @@ end
 #end
 
 # Greeting: fastfetch as a job ticket from 永遠堂 (Eien-dō), the carpentry
-# workshop, under its name board (~/.config/fastfetch/eien-do.png). The board
+# workshop, stamped with its seal (~/.config/fastfetch/eien-do.png). The seal
 # needs kitty; other terminals get just the ticket.
 function fish_greeting
-    set -l sign ~/.config/fastfetch/eien-do.png
-    if test "$TERM" = xterm-kitty; and test -f $sign
-        command fastfetch --logo-type kitty-direct --logo $sign --logo-width 38 --logo-height 6 \
-            --logo-position top --logo-padding-top 1 --logo-padding-left 0
+    set -l seal ~/.config/fastfetch/eien-do.png
+    if test "$TERM" = xterm-kitty; and test -f $seal
+        command fastfetch --logo-type kitty-direct --logo $seal --logo-width 12 --logo-height 6 \
+            --logo-padding-top 1 --logo-padding-left 2 --logo-padding-right 3
     else
         command fastfetch
     end
 end
 
-# plain `fastfetch` shows the board too; with options it's fastfetch as usual
+# plain `fastfetch` shows the seal too; with options it's fastfetch as usual
 function fastfetch
     if test (count $argv) -eq 0
         fish_greeting
